@@ -6,9 +6,15 @@ using UnityEngine.UI;
 
 public class ExperienceBar : MonoBehaviour
 {
+    public static ExperienceBar Instance;
     [SerializeField] private Image m_Fill;
     [SerializeField] private TextMeshProUGUI m_LevelText;
     [SerializeField] private TextMeshProUGUI m_ExperienceText;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     public void SetFill(float fillAmount)
     {
@@ -24,6 +30,4 @@ public class ExperienceBar : MonoBehaviour
     {
         m_ExperienceText.text = experience.ToString();
     }
-
-
 }
