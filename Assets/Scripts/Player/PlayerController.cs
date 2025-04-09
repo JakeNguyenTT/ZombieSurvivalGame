@@ -13,13 +13,13 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         m_MaxHealth = m_Health = m_CharacterData.maxHealth;
-        m_WeaponSystem.Initialize(m_CharacterData.startingWeapon, transform);
+        // m_WeaponSystem.Initialize(m_CharacterData.startingWeapon, transform);
         if (m_MainCamera == null) m_MainCamera = Camera.main;
     }
 
     void Update()
     {
-        m_WeaponSystem.Tick(Time.deltaTime);
+        // m_WeaponSystem.Tick(Time.deltaTime);
     }
 
     public void TakeDamage(float amount)

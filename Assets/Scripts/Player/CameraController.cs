@@ -15,19 +15,20 @@ public class CameraController : MonoBehaviour
     // Camera positioning and look-at adjustments
     [SerializeField] private float m_LookHeight = 1f;       // Height offset for look-at point
 
+    [Header("Read Only")]
     // Internal variables for rotation and distance
-    private float m_Yaw;           // Current horizontal angle
-    private float m_Pitch;         // Current vertical angle
-    private float m_TargetYaw;     // Target horizontal angle
-    private float m_TargetPitch;   // Target vertical angle
-    private float m_Distance;      // Distance from player
+    [SerializeField] private float m_Yaw;           // Current horizontal angle
+    [SerializeField] private float m_Pitch;         // Current vertical angle
+    [SerializeField] private float m_TargetYaw;     // Target horizontal angle
+    [SerializeField] private float m_TargetPitch;   // Target vertical angle
+    [SerializeField] private float m_Distance;      // Distance from player
 
     void Start()
     {
         // Initialize yaw, pitch, and distance based on the initial offset
         Vector3 dir = (-m_Offset).normalized; // Direction from camera to player
         m_Yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-        m_Pitch = Mathf.Asin(dir.y) * Mathf.Rad2Deg;
+        m_Pitch = -Mathf.Asin(dir.y) * Mathf.Rad2Deg;
         m_TargetYaw = m_Yaw;
         m_TargetPitch = m_Pitch;
         m_Distance = m_Offset.magnitude;

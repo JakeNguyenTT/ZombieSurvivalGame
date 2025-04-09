@@ -26,17 +26,17 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        m_EnemySpawner.Initialize();
-        m_UIManager.Initialize();
-        m_AudioManager.PlayMusic("BackgroundMusic");
-        StartGame();
+        // m_EnemySpawner.Initialize();
+        // m_UIManager.Initialize();
+        // m_AudioManager.PlayMusic("BackgroundMusic");
+        // StartGame();
     }
 
     void Update()
     {
-        if (!isPlaying) return;
-        gameTime += Time.deltaTime;
-        m_UIManager.UpdateTime(gameTime);
+        // if (!isPlaying) return;
+        // gameTime += Time.deltaTime;
+        // m_UIManager.UpdateTime(gameTime);
     }
 
     public void StartGame()

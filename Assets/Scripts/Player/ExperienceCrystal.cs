@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ExperienceCrystal : MonoBehaviour
+public class ExperienceGem : MonoBehaviour
 {
     [SerializeField] private float speed = 5f;
     [SerializeField] private float pickupRange = 2f;
