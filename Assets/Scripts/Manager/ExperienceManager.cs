@@ -5,9 +5,10 @@ public class ExperienceManager : MonoBehaviour
 {
     public static ExperienceManager Instance { get; private set; }
 
-    [SerializeField] private float[] expThresholds;
-    private float currentExp;
-    private int currentLevel;
+    [SerializeField] private float m_ExpThreshold = 100f;
+    [Header("Read Only")]
+    [SerializeField] private float m_CurrentExp;
+    [SerializeField] private int m_CurrentLevel;
 
     public event Action<UpgradeData[]> OnLevelUp;
 
@@ -17,20 +18,31 @@ public class ExperienceManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    void Start()
+    {
+        m_CurrentExp = 0;
+        m_CurrentLevel = 1;
+        UIManager.Instance.UpdateExperience(m_CurrentExp / m_ExpThreshold);
+        UIManager.Instance.UpdateLevel(m_CurrentLevel);
+    }
+
     public void AddExperience(float amount)
     {
-        currentExp += amount;
-        UIManager.Instance.UpdateExperience(currentExp / expThresholds[currentLevel]);
-        if (currentExp >= expThresholds[currentLevel])
+        m_CurrentExp += amount;
+        if (m_CurrentExp >= m_ExpThreshold)
             LevelUp();
+        else
+            UIManager.Instance.UpdateExperience(m_CurrentExp / m_ExpThreshold);
     }
 
     private void LevelUp()
     {
-        currentLevel++;
-        currentExp = 0;
-        Time.timeScale = 0f; // Pause game
-        UpgradeData[] options = UpgradeManager.Instance.GetUpgradeOptions(3);
-        OnLevelUp?.Invoke(options);
+        m_CurrentLevel++;
+        m_CurrentExp = 0;
+        UIManager.Instance.UpdateExperience(m_CurrentExp / m_ExpThreshold);
+        UIManager.Instance.UpdateLevel(m_CurrentLevel);
+        // GameManager.Instance.PauseGame();
+        // UpgradeData[] options = UpgradeManager.Instance.GetUpgradeOptions(3);
+        // OnLevelUp?.Invoke(options);
     }
 }

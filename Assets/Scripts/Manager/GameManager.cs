@@ -27,22 +27,22 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         // m_EnemySpawner.Initialize();
-        // m_UIManager.Initialize();
+        m_UIManager.Initialize();
         // m_AudioManager.PlayMusic("BackgroundMusic");
-        // StartGame();
+        StartGame();
     }
 
     void Update()
     {
-        // if (!isPlaying) return;
-        // gameTime += Time.deltaTime;
-        // m_UIManager.UpdateTime(gameTime);
+        if (!isPlaying) return;
+        gameTime += Time.deltaTime;
+        m_UIManager.UpdateTime(gameTime);
     }
 
     public void StartGame()
     {
         isPlaying = true;
-        m_EnemySpawner.StartSpawning();
+        // m_EnemySpawner.StartSpawning();
     }
 
     public void GameOver()
@@ -52,6 +52,18 @@ public class GameManager : MonoBehaviour
         m_EnemySpawner.StopSpawning();
         OnGameOver?.Invoke();
         m_UIManager.ShowGameOver(gameTime);
+    }
+
+    public void PauseGame()
+    {
+        isPlaying = false;
+        Time.timeScale = 0;
+    }
+
+    public void ResumeGame()
+    {
+        isPlaying = true;
+        Time.timeScale = 1;
     }
 
     public Vector3 GetPlayerPosition() => m_Player.transform.position;

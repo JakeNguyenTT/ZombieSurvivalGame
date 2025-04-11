@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
         m_MaxHealth = m_Health = m_CharacterData.maxHealth;
         // m_WeaponSystem.Initialize(m_CharacterData.startingWeapon, transform);
         if (m_MainCamera == null) m_MainCamera = Camera.main;
+        UIManager.Instance.UpdateHealth(m_Health / m_MaxHealth);
     }
 
     void Update()

@@ -50,7 +50,7 @@ public class WeaponSystem : MonoBehaviour
         Vector3 direction = m_PlayerTransform.forward;
         Projectile proj = m_ProjectilePool.GetProjectile(weapon.projectilePrefab);
         proj.Initialize(position, direction, weapon.damage);
-        AudioManager.Instance.PlaySFX("Shoot");
+        AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
     }
 
     private void FireSpread(Vector3 position, WeaponData weapon)
@@ -66,7 +66,7 @@ public class WeaponSystem : MonoBehaviour
             Projectile proj = m_ProjectilePool.GetProjectile(weapon.projectilePrefab);
             proj.Initialize(position, direction, weapon.damage);
         }
-        AudioManager.Instance.PlaySFX("Shoot");
+        AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
     }
 }
 

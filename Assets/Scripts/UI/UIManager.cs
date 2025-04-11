@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,14 +6,14 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    [SerializeField] private Slider healthBar;
-    [SerializeField] private Slider expBar;
-    [SerializeField] private Text levelText;
-    [SerializeField] private Text timeText;
-    [SerializeField] private GameObject upgradePanel;
-    [SerializeField] private Button[] upgradeButtons;
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private Text gameOverTimeText;
+    [SerializeField] private PercentBar m_HealthBar;
+    [SerializeField] private PercentBar m_ExpBar;
+    [SerializeField] private TextMeshProUGUI m_LevelText;
+    [SerializeField] private TextMeshProUGUI m_TimeText;
+    [SerializeField] private GameObject m_UpgradePanel;
+    [SerializeField] private Button[] m_UpgradeButtons;
+    [SerializeField] private GameObject m_GameOverPanel;
+    [SerializeField] private TextMeshProUGUI m_GameOverTimeText;
 
     void Awake()
     {
@@ -23,29 +24,30 @@ public class UIManager : MonoBehaviour
     public void Initialize()
     {
         ExperienceManager.Instance.OnLevelUp += ShowUpgradeOptions;
-        GameManager.Instance.OnGameOver += () => gameOverPanel.SetActive(true);
+        GameManager.Instance.OnGameOver += () => m_GameOverPanel.SetActive(true);
     }
 
-    public void UpdateHealth(float value) => healthBar.value = value;
-    public void UpdateExperience(float value) => expBar.value = value;
-    public void UpdateTime(float time) => timeText.text = $"Time: {time:F1}s";
+    public void UpdateHealth(float value) => m_HealthBar.Value = value;
+    public void UpdateExperience(float value) => m_ExpBar.Value = value;
+    public void UpdateLevel(int value) => m_LevelText.text = $"{value}";
+    public void UpdateTime(float time) => m_TimeText.text = $"Time: {FormatTime(time)}";
 
     private void ShowUpgradeOptions(UpgradeData[] options)
     {
-        upgradePanel.SetActive(true);
-        for (int i = 0; i < upgradeButtons.Length; i++)
+        m_UpgradePanel.SetActive(true);
+        for (int i = 0; i < m_UpgradeButtons.Length; i++)
         {
             if (i < options.Length)
             {
-                upgradeButtons[i].gameObject.SetActive(true);
-                upgradeButtons[i].GetComponentInChildren<Text>().text = options[i].description;
+                m_UpgradeButtons[i].gameObject.SetActive(true);
+                m_UpgradeButtons[i].GetComponentInChildren<Text>().text = options[i].description;
                 int index = i;
-                upgradeButtons[i].onClick.RemoveAllListeners();
-                upgradeButtons[i].onClick.AddListener(() => SelectUpgrade(options[index]));
+                m_UpgradeButtons[i].onClick.RemoveAllListeners();
+                m_UpgradeButtons[i].onClick.AddListener(() => SelectUpgrade(options[index]));
             }
             else
             {
-                upgradeButtons[i].gameObject.SetActive(false);
+                m_UpgradeButtons[i].gameObject.SetActive(false);
             }
         }
     }
@@ -53,12 +55,19 @@ public class UIManager : MonoBehaviour
     private void SelectUpgrade(UpgradeData upgrade)
     {
         UpgradeManager.Instance.ApplyUpgrade(upgrade);
-        upgradePanel.SetActive(false);
+        m_UpgradePanel.SetActive(false);
     }
 
     public void ShowGameOver(float time)
     {
-        gameOverTimeText.text = $"Survived: {time:F1}s";
-        gameOverPanel.SetActive(true);
+        m_GameOverPanel.SetActive(true);
+        m_GameOverTimeText.text = $"Survived: {FormatTime(time)}";
+    }
+
+    private string FormatTime(float time)
+    {
+        int minutes = Mathf.FloorToInt(time / 60);
+        int seconds = Mathf.FloorToInt(time % 60);
+        return $"{minutes:00}:{seconds:00}";
     }
 }
