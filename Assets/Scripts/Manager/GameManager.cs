@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    [SerializeField] private PlayerController m_Player;
+    [SerializeField] private PlayerManager m_Player;
     [SerializeField] private EnemySpawner m_EnemySpawner;
     [SerializeField] private UIManager m_UIManager;
     [SerializeField] private AudioManager m_AudioManager;

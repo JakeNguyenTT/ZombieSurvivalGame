@@ -42,7 +42,7 @@ public class EnemyBehavior : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerController>().TakeDamage(damage);
+            other.GetComponent<PlayerManager>().TakeDamage(damage);
             Die();
         }
     }

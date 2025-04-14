@@ -3,6 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WeaponData", menuName = "Game/WeaponData")]
 public class WeaponData : ScriptableObject
 {
+    public Transform gunPrefab;
     public FiringType firingType;
     public Projectile projectilePrefab;
     public float fireRate = 0.5f;

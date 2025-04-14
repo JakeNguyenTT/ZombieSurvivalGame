@@ -6,7 +6,7 @@ public class UpgradeManager : MonoBehaviour
     public static UpgradeManager Instance { get; private set; }
 
     [SerializeField] private List<UpgradeData> availableUpgrades;
-    [SerializeField] private PlayerController player;
+    [SerializeField] private PlayerManager player;
     [SerializeField] private WeaponSystem weaponSystem;
 
     void Awake()

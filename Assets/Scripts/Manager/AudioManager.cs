@@ -11,6 +11,11 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioLibrary m_AudioLibrary;
     [SerializeField] private float m_MusicFadeDuration = 1f; // duration for fading
 
+    [Range(0f, 1f)]
+    [SerializeField] private float m_MusicVolume = 1f;
+    [Range(0f, 1f)]
+    [SerializeField] private float m_SFXVolume = 1f;
+
     [Header("SFX")]
     [SerializeField] private AudioSource m_SFXPrefab;
     [SerializeField] private int m_SFXPoolInitSize = 10;
@@ -52,16 +57,17 @@ public class AudioManager : MonoBehaviour
     public void PlayBGM(AudioID audioId, bool fade = false)
     {
         AudioData config = m_AudioLibrary.GetItem(audioId);
+        float targetVolume = config.volume * m_MusicVolume;
         if (config != null && config.isBGM)
         {
             if (fade)
             {
-                FadeBGM(config.clip, config.volume);
+                FadeBGM(config.clip, targetVolume);
             }
             else
             {
                 m_MusicSource.clip = config.clip;
-                m_MusicSource.volume = config.volume;
+                m_MusicSource.volume = targetVolume;
                 m_MusicSource.Play();
             }
         }
@@ -98,13 +104,14 @@ public class AudioManager : MonoBehaviour
     public void PlaySFX(AudioID audioId, Vector3 position, float volume = 1f, float pitch = 1f, bool spatial = true)
     {
         var audioData = m_AudioLibrary.GetItem(audioId);
+        float targetVolume = audioData.volume * m_SFXVolume * volume;
         if (audioData == null) return;
 
         if (m_SFXPool.Count == 0)
             AddSFXToPool();
 
         AudioSource source = m_SFXPool.Dequeue();
-        SetupSource(source, audioData.clip, position, volume, pitch, spatial, loop: false);
+        SetupSource(source, audioData.clip, position, targetVolume, pitch, spatial, loop: false);
         source.Play();
         StartCoroutine(ReturnAfterPlay(source, audioData.clip.length / pitch));
     }
