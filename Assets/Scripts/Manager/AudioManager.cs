@@ -54,15 +54,16 @@ public class AudioManager : MonoBehaviour
         m_SFXPool.Enqueue(sfxObject);
     }
 
-    public void PlayBGM(AudioID audioId, bool fade = false)
+    public void PlayBGM(AudioID audioId, bool fade = false, float fadeDuration = 1f)
     {
         AudioData config = m_AudioLibrary.GetItem(audioId);
+        
         float targetVolume = config.volume * m_MusicVolume;
         if (config != null && config.isBGM)
         {
             if (fade)
             {
-                FadeBGM(config.clip, targetVolume);
+                FadeBGM(config.clip, targetVolume, fadeDuration);
             }
             else
             {
@@ -73,9 +74,8 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void FadeBGM(AudioClip newClip, float targetVolume)
+    private void FadeBGM(AudioClip newClip, float targetVolume, float fadeDuration)
     {
-        float fadeDuration = 1f;
 
         // If music is playing, fade out
         if (m_MusicSource.isPlaying)

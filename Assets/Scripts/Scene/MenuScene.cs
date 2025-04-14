@@ -5,7 +5,7 @@ public class MenuScene : MonoBehaviour
 {
     void Start()
     {
-        AudioManager.Instance.PlayBGM(AudioID.BGM_Menu, true);
+        AudioManager.Instance.PlayBGM(AudioID.BGM_Menu, true, 1.5f);
     }
 
     public void OnButtonStartGame()

@@ -4,8 +4,9 @@ using System.Collections.Generic;
 public class WeaponSystem : MonoBehaviour
 {
     [SerializeField] private ProjectilePool m_ProjectilePool;
-    private List<WeaponInstance> m_ActiveWeapons = new List<WeaponInstance>();
-    private Transform m_PlayerTransform;
+    [Header("Read Only")]
+    [SerializeField] private List<WeaponInstance> m_ActiveWeapons = new List<WeaponInstance>();
+    [SerializeField] private Transform m_PlayerTransform;
 
     public void Initialize(WeaponData startingWeapon, Transform playerTransform)
     {
@@ -45,12 +46,17 @@ public class WeaponSystem : MonoBehaviour
         }
     }
 
+    public void FireMainWeapon(Vector3 position)
+    {
+        FireSingle(position, m_ActiveWeapons[0].data);
+    }
+
     private void FireSingle(Vector3 position, WeaponData weapon)
     {
         Vector3 direction = m_PlayerTransform.forward;
         Projectile proj = m_ProjectilePool.GetProjectile(weapon.projectilePrefab);
         proj.Initialize(position, direction, weapon.damage);
-        AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
+        // AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
     }
 
     private void FireSpread(Vector3 position, WeaponData weapon)
@@ -66,7 +72,7 @@ public class WeaponSystem : MonoBehaviour
             Projectile proj = m_ProjectilePool.GetProjectile(weapon.projectilePrefab);
             proj.Initialize(position, direction, weapon.damage);
         }
-        AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
+        // AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
     }
 }
 
@@ -75,4 +81,5 @@ public class WeaponInstance
 {
     public WeaponData data;
     public float timer;
+    public Vector3 position;
 }

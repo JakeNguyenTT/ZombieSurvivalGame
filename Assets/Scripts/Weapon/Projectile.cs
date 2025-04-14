@@ -33,7 +33,7 @@ public class Projectile : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             other.GetComponent<EnemyBehavior>().TakeDamage(damage);
-            PlayHitEffect();
+            //PlayHitEffect();
             ReturnToPool();
         }
     }
@@ -49,5 +49,6 @@ public class Projectile : MonoBehaviour
     {
         isActive = false;
         gameObject.SetActive(false);
+        ProjectilePool.Instance.ReturnProjectile(this);
     }
 }

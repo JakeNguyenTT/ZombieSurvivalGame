@@ -6,6 +6,8 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private WeaponSystem m_WeaponSystem;
     [SerializeField] private Camera m_MainCamera;
     [SerializeField] private Transform m_GunTransform;
+    [SerializeField] private Transform m_GunMuzzle;
+    public Transform GunMuzzle => m_GunMuzzle;
 
     private float m_MoveSpeed;
     private float m_Health;
@@ -14,7 +16,7 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
         m_MaxHealth = m_Health = m_CharacterData.maxHealth;
-        // m_WeaponSystem.Initialize(m_CharacterData.startingWeapon, transform);
+        m_WeaponSystem.Initialize(m_CharacterData.startingWeapon, transform);
         if (m_MainCamera == null) m_MainCamera = Camera.main;
         UIManager.Instance.UpdateHealth(m_Health / m_MaxHealth);
     }
