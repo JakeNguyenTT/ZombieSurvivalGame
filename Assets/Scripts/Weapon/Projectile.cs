@@ -12,6 +12,7 @@ public class Projectile : MonoBehaviour
     public void Initialize(Vector3 position, Vector3 dir, float dmg)
     {
         transform.position = position;
+        transform.rotation = Quaternion.LookRotation(dir);
         direction = dir.normalized;
         damage = dmg;
         isActive = true;
@@ -30,10 +31,34 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Trigger: " + other.gameObject.name);
         if (other.CompareTag("Enemy"))
         {
             other.GetComponent<EnemyBehavior>().TakeDamage(damage);
             //PlayHitEffect();
+            ReturnToPool();
+        }
+
+        if (other.CompareTag("Obstacle"))
+        {
+            PlayHitEffect();
+            ReturnToPool();
+        }
+    }
+
+    void OnCollisionEnter(Collision other)
+    {
+        Debug.Log("Collision: " + other.gameObject.name);
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            other.gameObject.GetComponent<EnemyBehavior>().TakeDamage(damage);
+            //PlayHitEffect();
+            ReturnToPool();
+        }
+
+        if (other.gameObject.CompareTag("Obstacle"))
+        {
+            PlayHitEffect();
             ReturnToPool();
         }
     }

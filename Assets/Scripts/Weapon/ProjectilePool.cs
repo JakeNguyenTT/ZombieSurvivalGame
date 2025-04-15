@@ -16,7 +16,7 @@ public class ProjectilePool : MonoBehaviour
 
     void Start()
     {
-         m_ProjectileDatas = new List<ProjectileData>();
+        m_ProjectileDatas = new List<ProjectileData>();
     }
 
     public Projectile GetProjectile(Projectile prefab)
@@ -28,7 +28,6 @@ public class ProjectilePool : MonoBehaviour
         }
 
         Queue<Projectile> pool = pools[prefab.name];
-        Debug.Log($"Pool size: {pool.Count}");
         if (pool.Count == 0) Preload(prefab, initialPoolSize / 2);
 
         Projectile proj = pool.Dequeue();
@@ -42,6 +41,7 @@ public class ProjectilePool : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Projectile proj = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            proj.name = prefab.name;
             proj.gameObject.SetActive(false);
             pools[prefab.name].Enqueue(proj);
             m_ProjectileDatas.Add(new ProjectileData { ProjectileName = prefab.name, currentPoolSize = pools[prefab.name].Count });
@@ -50,11 +50,10 @@ public class ProjectilePool : MonoBehaviour
 
     public void ReturnProjectile(Projectile proj)
     {
-        // get first key 
-        var key = pools.Keys.First();
-        Debug.Log($"Returning {proj.name} to pool - Pool size: {key}");
-        // pools[proj.name].Enqueue(proj);
-        // m_ProjectileDatas.Find(data => data.ProjectileName == proj.name).currentPoolSize = pools[proj.name].Count;
+        if (proj == null) return;
+        // Return to pool
+        pools[proj.name].Enqueue(proj);
+        m_ProjectileDatas.Find(data => data.ProjectileName == proj.name).currentPoolSize = pools[proj.name].Count;
     }
 }
 

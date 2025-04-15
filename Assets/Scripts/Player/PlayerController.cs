@@ -18,18 +18,13 @@ public class PlayerController : MonoBehaviour
     {
         if (m_Input.shoot)
         {
-            Debug.Log("Shoot");
-            m_IsFiring = true;
+            Shoot();
         }
     }
 
-    private void FixedUpdate()
+    private void Shoot()
     {
-        if (m_IsFiring)
-        {
-            Debug.Log("Fire");
-            m_WeaponSystem.FireMainWeapon(m_PlayerManager.GunMuzzle.position);
-            m_IsFiring = false;
-        }
+        m_WeaponSystem.FireMainWeapon(m_PlayerManager.GunMuzzle.position);
+        m_Input.shoot = false;
     }
 }
