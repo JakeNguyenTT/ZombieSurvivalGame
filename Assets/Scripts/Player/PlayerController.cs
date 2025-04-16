@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.Instance.IsPlaying) return;
         if (m_Input.shoot)
         {
             Shoot();

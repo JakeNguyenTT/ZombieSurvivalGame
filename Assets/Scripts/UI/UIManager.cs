@@ -6,19 +6,32 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
+    [Header("HUD")]
     [SerializeField] private PercentBar m_HealthBar;
     [SerializeField] private PercentBar m_ExpBar;
     [SerializeField] private TextMeshProUGUI m_LevelText;
     [SerializeField] private TextMeshProUGUI m_TimeText;
+
+    [Header("Panels")]
     [SerializeField] private GameObject m_UpgradePanel;
-    [SerializeField] private Button[] m_UpgradeButtons;
+    [SerializeField] private GameObject m_PausePanel;
     [SerializeField] private GameObject m_GameOverPanel;
+    [SerializeField] private Image m_FadeBackground;
     [SerializeField] private TextMeshProUGUI m_GameOverTimeText;
+    [SerializeField] private Button[] m_UpgradeButtons;
 
     void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+    }
+
+    void Start()
+    {
+        m_FadeBackground.gameObject.SetActive(false);
+        m_UpgradePanel.SetActive(false);
+        m_PausePanel.SetActive(false);
+        m_GameOverPanel.SetActive(false);
     }
 
     public void Initialize()
@@ -69,5 +82,12 @@ public class UIManager : MonoBehaviour
         int minutes = Mathf.FloorToInt(time / 60);
         int seconds = Mathf.FloorToInt(time % 60);
         return $"{minutes:00}:{seconds:00}";
+    }
+
+    public void OnButtonPause()
+    {
+        GameManager.Instance.PauseGame();
+        m_FadeBackground.gameObject.SetActive(true);
+        m_PausePanel.SetActive(true);
     }
 }

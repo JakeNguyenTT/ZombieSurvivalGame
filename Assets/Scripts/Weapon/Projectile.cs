@@ -2,27 +2,27 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] private float speed = 10f;
-    [SerializeField] private ParticleSystem hitEffect;
+    [SerializeField] private float m_Speed = 10f;
+    [SerializeField] private ParticleSystem m_HitEffect;
 
-    private float damage;
-    private Vector3 direction;
-    private bool isActive;
+    private float m_Damage;
+    private Vector3 m_Direction;
+    private bool m_IsActive;
 
     public void Initialize(Vector3 position, Vector3 dir, float dmg)
     {
         transform.position = position;
         transform.rotation = Quaternion.LookRotation(dir);
-        direction = dir.normalized;
-        damage = dmg;
-        isActive = true;
+        m_Direction = dir.normalized;
+        m_Damage = dmg;
+        m_IsActive = true;
         gameObject.SetActive(true);
     }
 
     void Update()
     {
-        if (!isActive) return;
-        transform.position += direction * speed * Time.deltaTime;
+        if (!m_IsActive) return;
+        transform.position += m_Direction * m_Speed * Time.deltaTime;
 
         // Return to pool if too far from player
         if (Vector3.Distance(transform.position, GameManager.Instance.GetPlayerPosition()) > 20f)
@@ -34,8 +34,8 @@ public class Projectile : MonoBehaviour
         Debug.Log("Trigger: " + other.gameObject.name);
         if (other.CompareTag("Enemy"))
         {
-            other.GetComponent<EnemyBehavior>().TakeDamage(damage);
-            //PlayHitEffect();
+            other.GetComponent<EnemyBehavior>().TakeDamage(m_Damage);
+            PlayHitEffect();
             ReturnToPool();
         }
 
@@ -51,8 +51,8 @@ public class Projectile : MonoBehaviour
         Debug.Log("Collision: " + other.gameObject.name);
         if (other.gameObject.CompareTag("Enemy"))
         {
-            other.gameObject.GetComponent<EnemyBehavior>().TakeDamage(damage);
-            //PlayHitEffect();
+            other.gameObject.GetComponent<EnemyBehavior>().TakeDamage(m_Damage);
+            PlayHitEffect();
             ReturnToPool();
         }
 
@@ -65,14 +65,14 @@ public class Projectile : MonoBehaviour
 
     private void PlayHitEffect()
     {
-        ParticleSystem effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
+        ParticleSystem effect = Instantiate(m_HitEffect, transform.position, Quaternion.identity);
         effect.Play();
         Destroy(effect.gameObject, effect.main.duration);
     }
 
     private void ReturnToPool()
     {
-        isActive = false;
+        m_IsActive = false;
         gameObject.SetActive(false);
         ProjectilePool.Instance.ReturnProjectile(this);
     }

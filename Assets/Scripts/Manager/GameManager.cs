@@ -13,8 +13,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private UIManager m_UIManager;
     [SerializeField] private AudioManager m_AudioManager;
 
-    private float gameTime;
-    private bool isPlaying;
+    private float m_GameTime;
+    private bool m_IsPlaying;
+    public bool IsPlaying => m_IsPlaying;
 
     public event Action OnGameOver;
 
@@ -26,7 +27,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // m_EnemySpawner.Initialize();
+        m_EnemySpawner.Initialize();
         m_UIManager.Initialize();
         // m_AudioManager.PlayMusic("BackgroundMusic");
         StartGame();
@@ -34,15 +35,15 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (!isPlaying) return;
-        gameTime += Time.deltaTime;
-        m_UIManager.UpdateTime(gameTime);
+        if (!m_IsPlaying) return;
+        m_GameTime += Time.deltaTime;
+        m_UIManager.UpdateTime(m_GameTime);
     }
 
     public void StartGame()
     {
-        isPlaying = true;
-        // m_EnemySpawner.StartSpawning();
+        m_IsPlaying = true;
+        m_EnemySpawner.StartSpawning();
     }
 
     public void GameOver()
@@ -51,18 +52,18 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0;
         m_EnemySpawner.StopSpawning();
         OnGameOver?.Invoke();
-        m_UIManager.ShowGameOver(gameTime);
+        m_UIManager.ShowGameOver(m_GameTime);
     }
 
     public void PauseGame()
     {
-        isPlaying = false;
+        m_IsPlaying = false;
         Time.timeScale = 0;
     }
 
     public void ResumeGame()
     {
-        isPlaying = true;
+        m_IsPlaying = true;
         Time.timeScale = 1;
     }
 

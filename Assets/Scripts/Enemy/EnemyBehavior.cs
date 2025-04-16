@@ -2,31 +2,31 @@ using UnityEngine;
 
 public class EnemyBehavior : MonoBehaviour
 {
-    [SerializeField] private float speed;
-    [SerializeField] private float health;
-    [SerializeField] private float damage;
-    [SerializeField] private ParticleSystem deathEffect;
+    [SerializeField] private float m_Speed = 2f;
+    [SerializeField] private float m_Health = 100f;
+    [SerializeField] private float m_Damage = 10f;
+    [SerializeField] private ParticleSystem m_DeathEffect;
 
-    private float updateInterval = 0.1f;
-    private float updateTimer;
+    private float m_UpdateInterval = 0.1f;
+    private float m_UpdateTimer;
 
     public void Initialize(Vector3 position, EnemyData data)
     {
         transform.position = position;
-        speed = data.speed;
-        health = data.health;
-        damage = data.damage;
-        updateTimer = Random.Range(0f, updateInterval);
+        m_Speed = data.speed;
+        m_Health = data.health;
+        m_Damage = data.damage;
+        m_UpdateTimer = Random.Range(0f, m_UpdateInterval);
         gameObject.SetActive(true);
     }
 
     void Update()
     {
-        updateTimer -= Time.deltaTime;
-        if (updateTimer <= 0)
+        // m_UpdateTimer -= Time.deltaTime;
+        // if (m_UpdateTimer <= 0)
         {
             MoveTowardsPlayer();
-            updateTimer = updateInterval;
+            // m_UpdateTimer = m_UpdateInterval;
         }
     }
 
@@ -35,27 +35,30 @@ public class EnemyBehavior : MonoBehaviour
         Vector3 direction = (GameManager.Instance.GetPlayerPosition() - transform.position);
         direction.y = 0; // Keep movement in XZ plane
         direction.Normalize();
-        transform.position += direction * speed * updateInterval;
+        // transform.position += direction * m_Speed * m_UpdateInterval;
+        transform.position += direction * m_Speed * Time.deltaTime;
+        transform.LookAt(GameManager.Instance.GetPlayerPosition());
+        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerManager>().TakeDamage(damage);
-            Die();
+            other.GetComponent<PlayerManager>().TakeDamage(m_Damage);
+            // Die();
         }
     }
 
     public void TakeDamage(float amount)
     {
-        health -= amount;
-        if (health <= 0) Die();
+        m_Health -= amount;
+        if (m_Health <= 0) Die();
     }
 
     private void Die()
     {
-        ParticleSystem effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
+        ParticleSystem effect = Instantiate(m_DeathEffect, transform.position, Quaternion.identity);
         effect.Play();
         Destroy(effect.gameObject, effect.main.duration);
         gameObject.SetActive(false);

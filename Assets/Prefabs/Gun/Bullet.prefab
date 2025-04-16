@@ -51,8 +51,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cac861c211fb4a145911b38b0a7800a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
-  hitEffect: {fileID: 198175801688348628, guid: 7cd0c3c40a9f169469362f62bc1ea0dc, type: 3}
+  m_Speed: 10
+  m_HitEffect: {fileID: 198175801688348628, guid: 7cd0c3c40a9f169469362f62bc1ea0dc, type: 3}
 --- !u!23 &2356442
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -133,7 +133,7 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 0, a: 1}
   m_Intensity: 2
   m_Range: 300
   m_SpotAngle: 30
@@ -226,8 +226,8 @@ BoxCollider:
   m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0717232, y: 0.053795222, z: 1.0538826}
-  m_Center: {x: 0, y: 0, z: 0.5}
+  m_Size: {x: 0.21662138, y: 0.21507017, z: 0.8356283}
+  m_Center: {x: 0, y: 0.00921043, z: 0.29342332}
 --- !u!54 &3448376959851514468
 Rigidbody:
   m_ObjectHideFlags: 0

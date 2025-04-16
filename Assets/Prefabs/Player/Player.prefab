@@ -4362,15 +4362,15 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5374323174796416550}
+  - component: {fileID: 1267310075950648367}
+  - component: {fileID: 8627306787415762609}
   - component: {fileID: 7506830352073209378}
   - component: {fileID: 5581845779779620423}
   - component: {fileID: 3034629138410133720}
   - component: {fileID: 8352872694836416633}
   - component: {fileID: 2796271429712997525}
   - component: {fileID: 7400541076682723153}
-  - component: {fileID: 1267310075950648367}
-  - component: {fileID: 8627306787415762609}
-  m_Layer: 8
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -4397,6 +4397,37 @@ Transform:
   - {fileID: 7536932488548155682}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1267310075950648367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8303737180576488948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 423b65fa2f456494c9063ce1aa675c1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CharacterData: {fileID: 11400000, guid: 77ff294b13606ca439459c0055857dd7, type: 2}
+  m_WeaponSystem: {fileID: 0}
+  m_MainCamera: {fileID: 0}
+  m_GunTransform: {fileID: 7828802923527117144}
+  m_GunMuzzle: {fileID: 2498394944710645819}
+--- !u!114 &8627306787415762609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8303737180576488948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e5b1d308fbb9944e852678abd33c8ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_WeaponSystem: {fileID: 0}
+  m_PlayerManager: {fileID: 1267310075950648367}
 --- !u!95 &7506830352073209378
 Animator:
   serializedVersion: 5
@@ -4623,37 +4654,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &1267310075950648367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8303737180576488948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 423b65fa2f456494c9063ce1aa675c1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_CharacterData: {fileID: 11400000, guid: 77ff294b13606ca439459c0055857dd7, type: 2}
-  m_WeaponSystem: {fileID: 0}
-  m_MainCamera: {fileID: 0}
-  m_GunTransform: {fileID: 7828802923527117144}
-  m_GunMuzzle: {fileID: 2498394944710645819}
---- !u!114 &8627306787415762609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8303737180576488948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e5b1d308fbb9944e852678abd33c8ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_WeaponSystem: {fileID: 0}
-  m_PlayerManager: {fileID: 1267310075950648367}
 --- !u!1 &8530874397407416354
 GameObject:
   m_ObjectHideFlags: 0
