@@ -15,5 +15,5 @@ MonoBehaviour:
   gunPrefab: {fileID: 2552309794489289808, guid: 48cc905d709b35247a41dd247da4c881, type: 3}
   firingType: 0
   projectilePrefab: {fileID: -7508747050436777962, guid: e67a37406bfbeb8479b8d481eefeac47, type: 3}
-  fireRate: 0.5
-  damage: 40
+  fireRate: 1
+  damage: 60

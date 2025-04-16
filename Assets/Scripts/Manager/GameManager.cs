@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
     {
         m_IsPlaying = true;
         m_EnemySpawner.StartSpawning();
+        Time.timeScale = 1;
     }
 
     public void GameOver()

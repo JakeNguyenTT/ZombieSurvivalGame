@@ -73,8 +73,9 @@ public class UIManager : MonoBehaviour
 
     public void ShowGameOver(float time)
     {
+        m_FadeBackground.gameObject.SetActive(true);
         m_GameOverPanel.SetActive(true);
-        m_GameOverTimeText.text = $"Survived: {FormatTime(time)}";
+        m_GameOverTimeText.text = $" {FormatTime(time)}";
     }
 
     private string FormatTime(float time)
@@ -86,8 +87,13 @@ public class UIManager : MonoBehaviour
 
     public void OnButtonPause()
     {
-        GameManager.Instance.PauseGame();
         m_FadeBackground.gameObject.SetActive(true);
         m_PausePanel.SetActive(true);
+        GameManager.Instance.PauseGame();
+    }
+
+    public void HideFadeBackground()
+    {
+        m_FadeBackground.gameObject.SetActive(false);
     }
 }

@@ -4,10 +4,9 @@ using System.Collections.Generic;
 public class UpgradeManager : MonoBehaviour
 {
     public static UpgradeManager Instance { get; private set; }
-
-    [SerializeField] private List<UpgradeData> availableUpgrades;
-    [SerializeField] private PlayerManager player;
-    [SerializeField] private WeaponSystem weaponSystem;
+    [SerializeField] private PlayerManager m_Player;
+    [SerializeField] private WeaponSystem m_WeaponSystem;
+    [SerializeField] private List<UpgradeData> m_AvailableUpgrades;
 
     void Awake()
     {
@@ -17,7 +16,7 @@ public class UpgradeManager : MonoBehaviour
 
     public UpgradeData[] GetUpgradeOptions(int count)
     {
-        List<UpgradeData> options = new List<UpgradeData>(availableUpgrades);
+        List<UpgradeData> options = new List<UpgradeData>(m_AvailableUpgrades);
         UpgradeData[] result = new UpgradeData[Mathf.Min(count, options.Count)];
         for (int i = 0; i < result.Length; i++)
         {
@@ -33,13 +32,13 @@ public class UpgradeManager : MonoBehaviour
         switch (upgrade.type)
         {
             case UpgradeType.IncreaseSpeed:
-                player.IncreaseSpeed(upgrade.value);
+                m_Player.IncreaseSpeed(upgrade.value);
                 break;
             case UpgradeType.AddWeapon:
-                weaponSystem.AddWeapon(upgrade.weaponData);
+                m_WeaponSystem.AddWeapon(upgrade.weaponData);
                 break;
             case UpgradeType.Heal:
-                player.Heal(upgrade.value);
+                m_Player.Heal(upgrade.value);
                 break;
         }
         Time.timeScale = 1f; // Resume game

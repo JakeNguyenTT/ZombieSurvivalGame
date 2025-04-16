@@ -41,8 +41,8 @@ public class ExperienceManager : MonoBehaviour
         m_CurrentExp = 0;
         UIManager.Instance.UpdateExperience(m_CurrentExp / m_ExpThreshold);
         UIManager.Instance.UpdateLevel(m_CurrentLevel);
-        // GameManager.Instance.PauseGame();
-        // UpgradeData[] options = UpgradeManager.Instance.GetUpgradeOptions(3);
-        // OnLevelUp?.Invoke(options);
+        GameManager.Instance.PauseGame();
+        UpgradeData[] options = UpgradeManager.Instance.GetUpgradeOptions(3);
+        OnLevelUp?.Invoke(options);
     }
 }

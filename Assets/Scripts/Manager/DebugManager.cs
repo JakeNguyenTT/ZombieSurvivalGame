@@ -8,6 +8,8 @@ public class DebugManager : MonoBehaviour
 
     [Header("Debug")]
     [SerializeField] private bool m_Spawn100Gems = false;
+    [SerializeField] private bool m_Spawn100Enemies = false;
+    [SerializeField] private bool m_GameOver = false;
 
     void Update()
     {
@@ -21,6 +23,17 @@ public class DebugManager : MonoBehaviour
                 Vector3 randomPosition = new Vector3(Random.Range(-10f, 10f), 0, Random.Range(-10f, 10f));
                 Instantiate(m_ExperienceGemPrefabs, playerPosition + randomPosition, Quaternion.identity);
             }
+        }
+
+        if (m_Spawn100Enemies)
+        {
+            m_Spawn100Enemies = false;
+        }
+
+        if (m_GameOver)
+        {
+            m_GameOver = false;
+            GameManager.Instance.GameOver();
         }
     }
 }

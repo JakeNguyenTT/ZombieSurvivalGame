@@ -14,5 +14,6 @@ public class PausePanel : MonoBehaviour
     {
         Time.timeScale = 1;
         gameObject.SetActive(false);
+        UIManager.Instance.HideFadeBackground();
     }
 }

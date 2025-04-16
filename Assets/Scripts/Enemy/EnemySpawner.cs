@@ -7,6 +7,8 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private List<EnemyData> m_EnemyTypes;
     private Queue<EnemyBehavior> m_EnemyPool = new Queue<EnemyBehavior>();
 
+    [SerializeField] private float m_SpawnRange = 25f;
+
     [SerializeField] private int m_InitialPoolSize = 10000;
     private float m_SpawnRate = 1f;
     private float m_SpawnTimer;
@@ -65,7 +67,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if (m_EnemyPool.Count == 0) return;
         EnemyBehavior enemy = m_EnemyPool.Dequeue();
-        Vector2 circle = Random.insideUnitCircle.normalized * 15f;
+        Vector2 circle = Random.insideUnitCircle.normalized * m_SpawnRange;
         Vector3 spawnPos = new Vector3(circle.x, 0, circle.y) + GameManager.Instance.GetPlayerPosition();
         enemy.Initialize(spawnPos, m_EnemyTypes[Random.Range(0, m_EnemyTypes.Count)]);
         enemy.gameObject.SetActive(true);

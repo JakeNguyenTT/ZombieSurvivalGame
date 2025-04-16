@@ -46,12 +46,12 @@ public class EnemyBehavior : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             other.GetComponent<PlayerManager>().TakeDamage(m_Damage);
-            // Die();
         }
     }
 
     public void TakeDamage(float amount)
     {
+        Debug.Log($"{gameObject.name} take damage: {amount}");
         m_Health -= amount;
         if (m_Health <= 0) Die();
     }

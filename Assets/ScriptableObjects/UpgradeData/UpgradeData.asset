@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52a5e4a853eb6a04eb1e45ddcb868f07, type: 3}
   m_Name: UpgradeData
   m_EditorClassIdentifier: 
-  type: 0
+  type: 1
   value: 0
   weaponData: {fileID: 0}
   description: 
