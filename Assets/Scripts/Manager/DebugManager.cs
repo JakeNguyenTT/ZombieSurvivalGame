@@ -19,13 +19,8 @@ public class DebugManager : MonoBehaviour
         if (m_Spawn100Gems)
         {
             m_Spawn100Gems = false;
-            // spawn 100 gems around player
             Vector3 playerPosition = GameManager.Instance.GetPlayerPosition();
-            for (int i = 0; i < 100; i++)
-            {
-                Vector3 randomPosition = new Vector3(Random.Range(-20f, 20f), 0, Random.Range(-20f, 20f));
-                ExpSpawner.Instance.SpawnExp(playerPosition + randomPosition);
-            }
+            ExpSpawner.Instance.SpawnExpAround(playerPosition, 100, 20);
         }
 
         if (m_SpawnEnemies)
@@ -37,7 +32,7 @@ public class DebugManager : MonoBehaviour
         if (m_SpawnBoss60Seconds)
         {
             m_SpawnBoss60Seconds = false;
-            GameManager.Instance.SpawnBoss();
+            GameManager.Instance.SkipToBoss();
         }
 
         if (m_GameOver)

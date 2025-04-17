@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private PercentBar m_ExpBar;
     [SerializeField] private TextMeshProUGUI m_LevelText;
     [SerializeField] private TextMeshProUGUI m_TimeText;
+    [SerializeField] private TextMeshProUGUI m_EnemyKilledText;
 
     [Header("Panels")]
     [SerializeField] private UpgradePanel m_UpgradePanel;
@@ -43,6 +44,7 @@ public class UIManager : MonoBehaviour
     public void UpdateExperience(float value, float maxValue) => m_ExpBar.SetValue(value, maxValue, true);
     public void UpdateLevel(int value) => m_LevelText.text = $"{value}";
     public void UpdateTime(float time) => m_TimeText.text = $"Time: {FormatTime(time)}";
+    public void UpdateEnemyKilled(int value) => m_EnemyKilledText.text = $"Killed: {value}";
 
     private void ShowUpgradeOptions(UpgradeData[] options)
     {

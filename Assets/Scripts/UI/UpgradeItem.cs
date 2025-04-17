@@ -14,6 +14,7 @@ public class UpgradeItem : MonoBehaviour
     {
         m_NameText.text = upgrade.name;
         m_DescriptionText.text = upgrade.description;
+        m_UpgradeButton.onClick.RemoveAllListeners();
         m_UpgradeButton.onClick.AddListener(() => OnButtonUpgrade(upgrade));
     }
 

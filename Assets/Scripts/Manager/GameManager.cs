@@ -84,9 +84,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SpawnBoss()
+    public void KillEnemy()
     {
-        m_GameTime = 60;
+        m_EnemyKilled++;
+        m_UIManager.UpdateEnemyKilled(m_EnemyKilled);
+    }
+
+    public void SkipToBoss()
+    {
+        m_EnemyKilled = 20;
     }
 
     public Vector3 GetPlayerPosition() => m_Player.transform.position;

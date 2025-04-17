@@ -47,6 +47,6 @@ public class WeaponInstance
                 penetrationCount += Mathf.FloorToInt(upgrade.value);
                 break;
         }
-        Debug.Log($"Upgraded {data.weaponName}: Damage={damage}, FireRate={fireRate}, Ammo={currentAmmo}/{ammoCapacity}, Penetration={penetrationCount}");
+        // Debug.Log($"Upgraded {data.weaponName}: Damage={damage}, FireRate={fireRate}, Ammo={currentAmmo}/{ammoCapacity}, Penetration={penetrationCount}");
     }
 }

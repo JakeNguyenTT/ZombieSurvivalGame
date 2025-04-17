@@ -109,7 +109,7 @@ public class EnemySpawner : MonoBehaviour
         enemy.gameObject.SetActive(false);
         m_EnemyPool.Enqueue(enemy);
         m_CurrentActiveEnemies--;
-        GameManager.Instance.EnemyKilled++;
+        GameManager.Instance.KillEnemy();
     }
 }
 

@@ -44,8 +44,15 @@ public class PlayerManager : MonoBehaviour
         if (m_InvisibleTimer > 0) return;
         m_Health -= amount;
         UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
-        if (m_Health <= 0) GameManager.Instance.GameOver();
-        m_InvisibleTimer = m_InvisibleTime;
+        if (m_Health <= 0)
+        {
+            m_Health = 0;
+            GameManager.Instance.GameOver();
+        }
+        else
+        {
+            m_InvisibleTimer = m_InvisibleTime;
+        }
     }
 
     public void Heal(float amount)
@@ -56,7 +63,6 @@ public class PlayerManager : MonoBehaviour
 
     public void IncreaseMaxHealth(float amount)
     {
-        Debug.Log("IncreaseMaxHealth: " + amount);
         m_MaxHealth += amount;
         m_Health += amount;
         UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);

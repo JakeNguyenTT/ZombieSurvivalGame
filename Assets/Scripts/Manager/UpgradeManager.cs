@@ -29,7 +29,7 @@ public class UpgradeManager : MonoBehaviour
 
     public void ApplyUpgrade(UpgradeData upgrade)
     {
-        Debug.Log($"Applying upgrade: {upgrade.name} {upgrade.value}");
+        Debug.Log($"Applying upgrade: <color=green>{upgrade.name} + {upgrade.value}</color>");
         switch (upgrade.type)
         {
             case UpgradeType.Heal:

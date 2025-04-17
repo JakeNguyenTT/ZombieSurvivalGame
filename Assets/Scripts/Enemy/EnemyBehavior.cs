@@ -6,7 +6,7 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] private float m_Health = 100f;
     [SerializeField] private float m_Damage = 10f;
     [SerializeField] private ParticleSystem m_DeathEffect;
-
+    bool m_IsBoss = false;
     EnemyData m_Data;
 
     // private float m_UpdateInterval = 0.1f;
@@ -22,6 +22,7 @@ public class EnemyBehavior : MonoBehaviour
         gameObject.SetActive(true);
         transform.localScale = Vector3.one;
         m_Data = data;
+        m_IsBoss = false;
     }
 
     public void InitializeBoss(Vector3 position, EnemyData data, EnemyEnhancement enhancement, int bossLevel = 1)
@@ -32,6 +33,7 @@ public class EnemyBehavior : MonoBehaviour
         m_Health = data.health * 10 * bossLevel;
         m_Damage = data.damage * 5 * bossLevel;
         transform.localScale = Vector3.one * 5;
+        m_IsBoss = true;
     }
 
     void Update()
@@ -78,6 +80,10 @@ public class EnemyBehavior : MonoBehaviour
     {
         AudioManager.Instance.PlaySFX(m_Data.deathSound, transform.position);
         ExpSpawner.Instance.SpawnExp(transform.position);
+        if (m_IsBoss)
+        {
+            ExpSpawner.Instance.SpawnExpAround(transform.position, 10, 5);
+        }
         ParticleSystem effect = Instantiate(m_DeathEffect, transform.position, Quaternion.identity);
         effect.Play();
         Destroy(effect.gameObject, effect.main.duration);
