@@ -87,11 +87,11 @@ public class EnemySpawner : MonoBehaviour
         var enemyKilled = GameManager.Instance.EnemyKilled;
         if (enemyKilled > 30)
         {
-            enemyEnhancement.health = enemyType.health + (enemyKilled - 40);
-            enemyEnhancement.damage = enemyType.damage + (enemyKilled - 40) * 0.1f;
+            enemyEnhancement.health = enemyType.health + (enemyKilled - 30);
+            enemyEnhancement.damage = enemyType.damage + (enemyKilled - 30) * 0.1f;
         }
         // if time more than 60 seconds, spawn enemy boss, bigger, more health, slower speed, more damage
-        if (enemyKilled > 30 && !m_IsBossSpawned)
+        if (enemyKilled > 20 && !m_IsBossSpawned)
         {
             enemy.InitializeBoss(spawnPos, enemyType, enemyEnhancement, 1);
             m_IsBossSpawned = true;

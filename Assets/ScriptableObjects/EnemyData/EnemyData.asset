@@ -16,3 +16,5 @@ MonoBehaviour:
   speed: 2
   health: 20
   damage: 5
+  hurtSound: {fileID: 8300000, guid: 4ab62cbf20de44a4582c40ed442be13a, type: 3}
+  deathSound: {fileID: 8300000, guid: 5b29b0de6b62747e68ebf332c8811f35, type: 3}

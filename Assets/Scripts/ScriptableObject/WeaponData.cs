@@ -13,6 +13,7 @@ public class WeaponData : ScriptableObject
     public int maxAmmo = 10;
     public float projectileSpeed = 10f;
     public int penetration = 0;
+    public AudioClip shootSound;
 }
 
 public enum FiringType { Single, Spread, Automatic }

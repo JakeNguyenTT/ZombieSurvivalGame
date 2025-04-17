@@ -7,4 +7,6 @@ public class EnemyData : ScriptableObject
     public float speed = 2f;
     public float health = 100f;
     public float damage = 5f;
+    public AudioClip hurtSound;
+    public AudioClip deathSound;
 }

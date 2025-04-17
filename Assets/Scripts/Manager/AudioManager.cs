@@ -57,7 +57,7 @@ public class AudioManager : MonoBehaviour
     public void PlayBGM(AudioID audioId, bool fade = false, float fadeDuration = 1f)
     {
         AudioData config = m_AudioLibrary.GetItem(audioId);
-        
+
         float targetVolume = config.volume * m_MusicVolume;
         if (config != null && config.isBGM)
         {
@@ -101,19 +101,28 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void PlaySFX(AudioID audioId, Vector3 position, float volume = 1f, float pitch = 1f, bool spatial = true)
+    public void PlaySFX(AudioClip clip, Vector3 position, float volume = 1f, float pitch = 1f, bool spatial = true)
     {
-        var audioData = m_AudioLibrary.GetItem(audioId);
-        float targetVolume = audioData.volume * m_SFXVolume * volume;
-        if (audioData == null) return;
-
+        if (clip == null)
+        {
+            Debug.LogError("SFX is missing");
+            return;
+        }
+        float targetVolume = volume * m_SFXVolume;
         if (m_SFXPool.Count == 0)
             AddSFXToPool();
 
         AudioSource source = m_SFXPool.Dequeue();
-        SetupSource(source, audioData.clip, position, targetVolume, pitch, spatial, loop: false);
+        SetupSource(source, clip, position, targetVolume, pitch, spatial, loop: false);
         source.Play();
-        StartCoroutine(ReturnAfterPlay(source, audioData.clip.length / pitch));
+        StartCoroutine(ReturnAfterPlay(source, clip.length / pitch));
+    }
+
+    public void PlaySFX(AudioID audioId, Vector3 position, float volume = 1f, float pitch = 1f, bool spatial = true)
+    {
+        var audioData = m_AudioLibrary.GetItem(audioId);
+        if (audioData == null) return;
+        PlaySFX(audioData.clip, position, audioData.volume * m_SFXVolume * volume, pitch, spatial);
     }
 
     private void SetupSource(AudioSource source, AudioClip clip, Vector3 position, float volume, float pitch, bool spatial, bool loop)
@@ -123,7 +132,7 @@ public class AudioManager : MonoBehaviour
         source.volume = volume;
         source.pitch = pitch;
         source.loop = loop;
-        source.spatialBlend = spatial ? 1f : 0f;
+        // source.spatialBlend = spatial ? 1f : 0f;
         source.gameObject.SetActive(true);
     }
 

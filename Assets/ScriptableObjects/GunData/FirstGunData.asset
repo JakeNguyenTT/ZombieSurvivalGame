@@ -22,3 +22,4 @@ MonoBehaviour:
   maxAmmo: 10
   projectileSpeed: 10
   penetration: 0
+  shootSound: {fileID: 8300000, guid: d7d19374a6ec37544ad352a63f339cb9, type: 3}

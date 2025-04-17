@@ -39,6 +39,7 @@ public class ExperienceManager : MonoBehaviour
     {
         m_CurrentLevel++;
         m_CurrentExp = m_CurrentExp - m_ExpThreshold;
+        m_ExpThreshold = m_ExpThreshold + 10;
         UIManager.Instance.UpdateExperience(m_CurrentExp, m_ExpThreshold);
         UIManager.Instance.UpdateLevel(m_CurrentLevel);
         GameManager.Instance.PauseGame();

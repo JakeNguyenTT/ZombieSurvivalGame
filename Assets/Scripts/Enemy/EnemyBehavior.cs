@@ -7,8 +7,10 @@ public class EnemyBehavior : MonoBehaviour
     [SerializeField] private float m_Damage = 10f;
     [SerializeField] private ParticleSystem m_DeathEffect;
 
-    private float m_UpdateInterval = 0.1f;
-    private float m_UpdateTimer;
+    EnemyData m_Data;
+
+    // private float m_UpdateInterval = 0.1f;
+    // private float m_UpdateTimer;
 
     public void Initialize(Vector3 position, EnemyData data, EnemyEnhancement enhancement)
     {
@@ -16,9 +18,10 @@ public class EnemyBehavior : MonoBehaviour
         m_Speed = data.speed + enhancement.speed;
         m_Health = data.health + enhancement.health;
         m_Damage = data.damage + enhancement.damage;
-        m_UpdateTimer = Random.Range(0f, m_UpdateInterval);
+        // m_UpdateTimer = Random.Range(0f, m_UpdateInterval);
         gameObject.SetActive(true);
         transform.localScale = Vector3.one;
+        m_Data = data;
     }
 
     public void InitializeBoss(Vector3 position, EnemyData data, EnemyEnhancement enhancement, int bossLevel = 1)
@@ -65,10 +68,15 @@ public class EnemyBehavior : MonoBehaviour
         Debug.Log($"{gameObject.name} take damage: {amount}");
         m_Health -= amount;
         if (m_Health <= 0) Die();
+        else
+        {
+            AudioManager.Instance.PlaySFX(m_Data.hurtSound, transform.position);
+        }
     }
 
     private void Die()
     {
+        AudioManager.Instance.PlaySFX(m_Data.deathSound, transform.position);
         ExpSpawner.Instance.SpawnExp(transform.position);
         ParticleSystem effect = Instantiate(m_DeathEffect, transform.position, Quaternion.identity);
         effect.Play();

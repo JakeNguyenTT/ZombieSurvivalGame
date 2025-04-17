@@ -8,19 +8,7 @@ public enum AudioID
     Walk,
     Run,
 
-    // Weapon SFX
-    Shoot,
-    PistolShot,
-    ShotgunShot,
-    RifleShot,
-
-    // Enemy SFX
-    ZombieGrowl,
-    ZombieAttack,
-
     // UI SFX
     ButtonClick,
     ButtonHover,
-
-
 }

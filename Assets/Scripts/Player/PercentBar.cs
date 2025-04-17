@@ -17,7 +17,7 @@ public class PercentBar : MonoBehaviour
     {
         m_Fill.fillAmount = value / maxValue;
         if (percentSign)
-            m_PercentText.text = $"{value * 100}%";
+            m_PercentText.text = $"{value / maxValue * 100}%";
         else
             m_PercentText.text = $"{value:F2}";
     }
