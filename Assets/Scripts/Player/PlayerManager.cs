@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    public static PlayerManager Instance { get; private set; }
     [SerializeField] private CharacterData m_CharacterData;
     [SerializeField] private WeaponSystem m_WeaponSystem;
     [SerializeField] private Camera m_MainCamera;
@@ -15,14 +16,18 @@ public class PlayerManager : MonoBehaviour
     private float m_MoveSpeed;
     private float m_Health;
     private float m_MaxHealth;
-    public void IncreaseSpeed(float amount) => m_MoveSpeed += amount;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
         m_MaxHealth = m_Health = m_CharacterData.maxHealth;
         m_WeaponSystem.Initialize(m_CharacterData.startingWeapon, transform);
         if (m_MainCamera == null) m_MainCamera = Camera.main;
-        UIManager.Instance.UpdateHealth(m_Health / m_MaxHealth);
+        UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
     }
 
     void Update()
@@ -38,7 +43,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_InvisibleTimer > 0) return;
         m_Health -= amount;
-        UIManager.Instance.UpdateHealth(m_Health / m_MaxHealth);
+        UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
         if (m_Health <= 0) GameManager.Instance.GameOver();
         m_InvisibleTimer = m_InvisibleTime;
     }
@@ -46,9 +51,18 @@ public class PlayerManager : MonoBehaviour
     public void Heal(float amount)
     {
         m_Health = Mathf.Min(m_Health + amount, m_MaxHealth);
-        UIManager.Instance.UpdateHealth(m_Health / m_MaxHealth);
+        UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
     }
 
+    public void IncreaseMaxHealth(float amount)
+    {
+        Debug.Log("IncreaseMaxHealth: " + amount);
+        m_MaxHealth += amount;
+        m_Health += amount;
+        UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
+    }
+
+    public void IncreaseSpeed(float amount) => m_MoveSpeed += amount;
 
     private void LookAtClosestEnemy()
     {

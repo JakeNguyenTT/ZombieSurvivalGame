@@ -11,7 +11,7 @@ public class WeaponSystem : MonoBehaviour
     public void Initialize(WeaponData startingWeapon, Transform playerTransform)
     {
         m_PlayerTransform = playerTransform;
-        AddWeapon(startingWeapon);
+        AddWeapon(startingWeapon, m_PlayerTransform.GetComponent<PlayerManager>().GunMuzzle);
     }
 
     public void Tick(float deltaTime)
@@ -21,7 +21,7 @@ public class WeaponSystem : MonoBehaviour
             weapon.timer -= deltaTime;
             if (weapon.timer <= 0)
             {
-                FireWeapon(weapon.data);
+                FireWeapon(weapon);
                 weapon.timer = weapon.data.fireRate;
             }
         }
@@ -29,13 +29,20 @@ public class WeaponSystem : MonoBehaviour
 
     public void AddWeapon(WeaponData weaponData)
     {
-        m_ActiveWeapons.Add(new WeaponInstance { data = weaponData, timer = weaponData.fireRate });
+        AddWeapon(weaponData, m_PlayerTransform);
     }
 
-    private void FireWeapon(WeaponData weapon)
+    public void AddWeapon(WeaponData weaponData, Transform muzzle)
     {
-        Vector3 position = m_PlayerTransform.position + Vector3.up * 1f; // Fire from slightly above ground
-        switch (weapon.firingType)
+        WeaponInstance weapon = new WeaponInstance();
+        weapon.Initialize(weaponData, muzzle);
+        m_ActiveWeapons.Add(weapon);
+    }
+
+    private void FireWeapon(WeaponInstance weapon)
+    {
+        Vector3 position = weapon.muzzle.position;
+        switch (weapon.data.firingType)
         {
             case FiringType.Single:
                 FireSingle(position, weapon);
@@ -48,18 +55,19 @@ public class WeaponSystem : MonoBehaviour
 
     public void FireMainWeapon(Vector3 position)
     {
-        FireSingle(position, m_ActiveWeapons[0].data);
+        Debug.Log("FireMainWeapon");
+        FireSingle(position, m_ActiveWeapons[0]);
     }
 
-    private void FireSingle(Vector3 position, WeaponData weapon)
+    private void FireSingle(Vector3 position, WeaponInstance weapon)
     {
         Vector3 direction = m_PlayerTransform.forward;
-        Projectile proj = m_ProjectilePool.GetProjectile(weapon.projectilePrefab);
-        proj.Initialize(position, direction, weapon.damage);
+        Projectile proj = m_ProjectilePool.GetProjectile(weapon.data.projectilePrefab);
+        proj.Initialize(position, direction, weapon);
         // AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
     }
 
-    private void FireSpread(Vector3 position, WeaponData weapon)
+    private void FireSpread(Vector3 position, WeaponInstance weapon)
     {
         int count = 3;
         float angleStep = 30f;
@@ -69,17 +77,13 @@ public class WeaponSystem : MonoBehaviour
         {
             float angle = startAngle + i * angleStep;
             Vector3 direction = Quaternion.Euler(0, angle, 0) * m_PlayerTransform.forward;
-            Projectile proj = m_ProjectilePool.GetProjectile(weapon.projectilePrefab);
-            proj.Initialize(position, direction, weapon.damage);
+            Projectile proj = m_ProjectilePool.GetProjectile(weapon.data.projectilePrefab);
+            proj.Initialize(position, direction, weapon);
         }
-        // AudioManager.Instance.PlaySFX(AudioID.Shoot, position);
     }
-}
 
-[System.Serializable]
-public class WeaponInstance
-{
-    public WeaponData data;
-    public float timer;
-    public Vector3 position;
+    public void ApplyUpgrade(UpgradeData upgrade)
+    {
+        m_ActiveWeapons[0].ApplyUpgrade(upgrade);
+    }
 }

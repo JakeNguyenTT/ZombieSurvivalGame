@@ -22,7 +22,7 @@ public class ExperienceManager : MonoBehaviour
     {
         m_CurrentExp = 0;
         m_CurrentLevel = 1;
-        UIManager.Instance.UpdateExperience(m_CurrentExp / m_ExpThreshold);
+        UIManager.Instance.UpdateExperience(m_CurrentExp, m_ExpThreshold);
         UIManager.Instance.UpdateLevel(m_CurrentLevel);
     }
 
@@ -32,14 +32,14 @@ public class ExperienceManager : MonoBehaviour
         if (m_CurrentExp >= m_ExpThreshold)
             LevelUp();
         else
-            UIManager.Instance.UpdateExperience(m_CurrentExp / m_ExpThreshold);
+            UIManager.Instance.UpdateExperience(m_CurrentExp, m_ExpThreshold);
     }
 
     private void LevelUp()
     {
         m_CurrentLevel++;
-        m_CurrentExp = 0;
-        UIManager.Instance.UpdateExperience(m_CurrentExp / m_ExpThreshold);
+        m_CurrentExp = m_CurrentExp - m_ExpThreshold;
+        UIManager.Instance.UpdateExperience(m_CurrentExp, m_ExpThreshold);
         UIManager.Instance.UpdateLevel(m_CurrentLevel);
         GameManager.Instance.PauseGame();
         UpgradeData[] options = UpgradeManager.Instance.GetUpgradeOptions(3);

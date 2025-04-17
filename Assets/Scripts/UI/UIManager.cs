@@ -13,12 +13,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI m_TimeText;
 
     [Header("Panels")]
-    [SerializeField] private GameObject m_UpgradePanel;
-    [SerializeField] private GameObject m_PausePanel;
-    [SerializeField] private GameObject m_GameOverPanel;
+    [SerializeField] private UpgradePanel m_UpgradePanel;
+    [SerializeField] private PausePanel m_PausePanel;
+    [SerializeField] private GameOverPanel m_GameOverPanel;
     [SerializeField] private Image m_FadeBackground;
     [SerializeField] private TextMeshProUGUI m_GameOverTimeText;
-    [SerializeField] private Button[] m_UpgradeButtons;
 
     void Awake()
     {
@@ -29,52 +28,39 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         m_FadeBackground.gameObject.SetActive(false);
-        m_UpgradePanel.SetActive(false);
-        m_PausePanel.SetActive(false);
-        m_GameOverPanel.SetActive(false);
+        m_UpgradePanel.gameObject.SetActive(false);
+        m_PausePanel.gameObject.SetActive(false);
+        m_GameOverPanel.gameObject.SetActive(false);
     }
 
     public void Initialize()
     {
         ExperienceManager.Instance.OnLevelUp += ShowUpgradeOptions;
-        GameManager.Instance.OnGameOver += () => m_GameOverPanel.SetActive(true);
+        GameManager.Instance.OnGameOver += ShowGameOver;
     }
 
-    public void UpdateHealth(float value) => m_HealthBar.Value = value;
-    public void UpdateExperience(float value) => m_ExpBar.Value = value;
+    public void UpdateHealth(float health, float maxHealth) => m_HealthBar.SetValue(health, maxHealth);
+    public void UpdateExperience(float value, float maxValue) => m_ExpBar.SetValue(value, maxValue, true);
     public void UpdateLevel(int value) => m_LevelText.text = $"{value}";
     public void UpdateTime(float time) => m_TimeText.text = $"Time: {FormatTime(time)}";
 
     private void ShowUpgradeOptions(UpgradeData[] options)
     {
-        m_UpgradePanel.SetActive(true);
-        for (int i = 0; i < m_UpgradeButtons.Length; i++)
-        {
-            if (i < options.Length)
-            {
-                m_UpgradeButtons[i].gameObject.SetActive(true);
-                m_UpgradeButtons[i].GetComponentInChildren<Text>().text = options[i].description;
-                int index = i;
-                m_UpgradeButtons[i].onClick.RemoveAllListeners();
-                m_UpgradeButtons[i].onClick.AddListener(() => SelectUpgrade(options[index]));
-            }
-            else
-            {
-                m_UpgradeButtons[i].gameObject.SetActive(false);
-            }
-        }
+        m_UpgradePanel.gameObject.SetActive(true);
+        m_UpgradePanel.Initialize(options);
     }
 
-    private void SelectUpgrade(UpgradeData upgrade)
+    public void SelectUpgrade(UpgradeData upgrade)
     {
         UpgradeManager.Instance.ApplyUpgrade(upgrade);
-        m_UpgradePanel.SetActive(false);
+        m_UpgradePanel.gameObject.SetActive(false);
+        GameManager.Instance.ResumeGame();
     }
 
-    public void ShowGameOver(float time)
+    private void ShowGameOver(float time)
     {
         m_FadeBackground.gameObject.SetActive(true);
-        m_GameOverPanel.SetActive(true);
+        m_GameOverPanel.gameObject.SetActive(true);
         m_GameOverTimeText.text = $" {FormatTime(time)}";
     }
 
@@ -88,7 +74,7 @@ public class UIManager : MonoBehaviour
     public void OnButtonPause()
     {
         m_FadeBackground.gameObject.SetActive(true);
-        m_PausePanel.SetActive(true);
+        m_PausePanel.gameObject.SetActive(true);
         GameManager.Instance.PauseGame();
     }
 

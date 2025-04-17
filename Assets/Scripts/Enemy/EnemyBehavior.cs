@@ -10,14 +10,25 @@ public class EnemyBehavior : MonoBehaviour
     private float m_UpdateInterval = 0.1f;
     private float m_UpdateTimer;
 
-    public void Initialize(Vector3 position, EnemyData data)
+    public void Initialize(Vector3 position, EnemyData data, EnemyEnhancement enhancement)
     {
         transform.position = position;
-        m_Speed = data.speed;
-        m_Health = data.health;
-        m_Damage = data.damage;
+        m_Speed = data.speed + enhancement.speed;
+        m_Health = data.health + enhancement.health;
+        m_Damage = data.damage + enhancement.damage;
         m_UpdateTimer = Random.Range(0f, m_UpdateInterval);
         gameObject.SetActive(true);
+        transform.localScale = Vector3.one;
+    }
+
+    public void InitializeBoss(Vector3 position, EnemyData data, EnemyEnhancement enhancement, int bossLevel = 1)
+    {
+        // boss is 10 times bigger
+        Initialize(position, data, enhancement);
+        m_Speed = data.speed - 1;
+        m_Health = data.health * 10 * bossLevel;
+        m_Damage = data.damage * 5 * bossLevel;
+        transform.localScale = Vector3.one * 5;
     }
 
     void Update()
@@ -58,9 +69,11 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Die()
     {
+        ExpSpawner.Instance.SpawnExp(transform.position);
         ParticleSystem effect = Instantiate(m_DeathEffect, transform.position, Quaternion.identity);
         effect.Play();
         Destroy(effect.gameObject, effect.main.duration);
         gameObject.SetActive(false);
+        EnemySpawner.Instance.ReturnEnemy(this);
     }
 }

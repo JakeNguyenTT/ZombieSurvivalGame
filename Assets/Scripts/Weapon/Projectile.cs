@@ -8,14 +8,18 @@ public class Projectile : MonoBehaviour
     private float m_Damage;
     private Vector3 m_Direction;
     private bool m_IsActive;
+    private int m_CurrentPenetrations;
+    private int m_MaxPenetrations = 1;
 
-    public void Initialize(Vector3 position, Vector3 dir, float dmg)
+    public void Initialize(Vector3 position, Vector3 dir, WeaponInstance weapon)
     {
         transform.position = position;
         transform.rotation = Quaternion.LookRotation(dir);
         m_Direction = dir.normalized;
-        m_Damage = dmg;
+        m_Damage = weapon.damage;
+        m_MaxPenetrations = weapon.penetrationCount;
         m_IsActive = true;
+        m_CurrentPenetrations = 0;
         gameObject.SetActive(true);
     }
 
@@ -31,31 +35,30 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Trigger: " + other.gameObject.name);
-        if (other.CompareTag("Enemy"))
-        {
-            other.GetComponent<EnemyBehavior>().TakeDamage(m_Damage);
-            PlayHitEffect();
-            ReturnToPool();
-        }
-
-        if (other.CompareTag("Obstacle"))
-        {
-            PlayHitEffect();
-            ReturnToPool();
-        }
+        CheckEnemy(other.gameObject);
+        CheckObstacle(other.gameObject);
     }
 
     void OnCollisionEnter(Collision other)
     {
-        Debug.Log("Collision: " + other.gameObject.name);
+        CheckEnemy(other.gameObject);
+        CheckObstacle(other.gameObject);
+    }
+
+    private void CheckEnemy(GameObject other)
+    {
         if (other.gameObject.CompareTag("Enemy"))
         {
             other.gameObject.GetComponent<EnemyBehavior>().TakeDamage(m_Damage);
             PlayHitEffect();
-            ReturnToPool();
+            m_CurrentPenetrations++;
+            if (m_CurrentPenetrations > m_MaxPenetrations)
+                ReturnToPool();
         }
+    }
 
+    private void CheckObstacle(GameObject other)
+    {
         if (other.gameObject.CompareTag("Obstacle"))
         {
             PlayHitEffect();

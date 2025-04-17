@@ -5,8 +5,19 @@ public class UpgradeData : ScriptableObject
 {
     public UpgradeType type;
     public float value;
-    public WeaponData weaponData; // For AddWeapon type
     public string description;
+    public WeaponData weaponData;
 }
 
-public enum UpgradeType { IncreaseSpeed, AddWeapon, Heal }
+public enum UpgradeType
+{
+    Heal,
+    AddWeapon,
+    Penetration,
+    MaxHealth,
+    Speed,
+    Damage,
+    FireRate,
+    ProjectileSpeed,
+    MaxAmmo,
+}

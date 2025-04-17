@@ -29,18 +29,22 @@ public class UpgradeManager : MonoBehaviour
 
     public void ApplyUpgrade(UpgradeData upgrade)
     {
+        Debug.Log($"Applying upgrade: {upgrade.name} {upgrade.value}");
         switch (upgrade.type)
         {
-            case UpgradeType.IncreaseSpeed:
-                m_Player.IncreaseSpeed(upgrade.value);
-                break;
-            case UpgradeType.AddWeapon:
-                m_WeaponSystem.AddWeapon(upgrade.weaponData);
-                break;
             case UpgradeType.Heal:
                 m_Player.Heal(upgrade.value);
                 break;
+            case UpgradeType.MaxHealth:
+                m_Player.IncreaseMaxHealth(upgrade.value);
+                break;
+            case UpgradeType.Speed:
+                m_Player.IncreaseSpeed(upgrade.value);
+                break;
+            case UpgradeType.Penetration:
+            case UpgradeType.Damage:
+                m_WeaponSystem.ApplyUpgrade(upgrade);
+                break;
         }
-        Time.timeScale = 1f; // Resume game
     }
 }

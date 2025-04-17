@@ -12,12 +12,20 @@ public class GameManager : MonoBehaviour
     [SerializeField] private EnemySpawner m_EnemySpawner;
     [SerializeField] private UIManager m_UIManager;
     [SerializeField] private AudioManager m_AudioManager;
-
+    public event Action<float> OnGameOver;
+    private int m_EnemyKilled;
     private float m_GameTime;
     private bool m_IsPlaying;
     public bool IsPlaying => m_IsPlaying;
-
-    public event Action OnGameOver;
+    public float GameTime => m_GameTime;
+    public int EnemyKilled
+    {
+        get => m_EnemyKilled;
+        set
+        {
+            m_EnemyKilled = value;
+        }
+    }
 
     void Awake()
     {
@@ -44,6 +52,7 @@ public class GameManager : MonoBehaviour
     {
         m_IsPlaying = true;
         m_EnemySpawner.StartSpawning();
+        m_EnemyKilled = 0;
         Time.timeScale = 1;
     }
 
@@ -52,8 +61,7 @@ public class GameManager : MonoBehaviour
         // Implement game over logic (e.g., show UI, stop spawning)
         Time.timeScale = 0;
         m_EnemySpawner.StopSpawning();
-        OnGameOver?.Invoke();
-        m_UIManager.ShowGameOver(m_GameTime);
+        OnGameOver?.Invoke(m_GameTime);
     }
 
     public void PauseGame()
@@ -66,6 +74,19 @@ public class GameManager : MonoBehaviour
     {
         m_IsPlaying = true;
         Time.timeScale = 1;
+    }
+
+    public void SpawnEnemies(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            m_EnemySpawner.SpawnEnemy();
+        }
+    }
+
+    public void SpawnBoss()
+    {
+        m_GameTime = 60;
     }
 
     public Vector3 GetPlayerPosition() => m_Player.transform.position;
