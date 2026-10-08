@@ -51,9 +51,9 @@
 - `enum MetaStat { MaxHealth, Damage, MoveSpeed, PickupRange }`; `MetaUpgrades.MaxLevel = 5`; `MetaUpgrades.Cost(int level)` = `50 * (level + 1)`; `MetaUpgrades.Bonus(MetaStat, int level)` = level × {10 HP, 0.10 dmg mult, 0.3 speed, 0.5 range}; `MetaUpgrades.Label(MetaStat)`
 - `RunRewards.Coins(int kills, float seconds, int bosses)` = `kills/2 + (int)(seconds/10) + bosses*25`
 
-- [ ] Write `CoreRulesTests` covering each formula, boundaries (t=0, clamp at 0.15, boss level before/at/after 90 and 210), weighted pick boundaries, PickIndices distinctness/zero-weight skip, cost/bonus at levels 0 and 5.
-- [ ] Implement Core; compile offline (scripts + tests against nunit).
-- [ ] Commit `Add core rules assembly with EditMode tests`.
+- [x] Write `CoreRulesTests` covering each formula, boundaries (t=0, clamp at 0.15, boss level before/at/after 90 and 210), weighted pick boundaries, PickIndices distinctness/zero-weight skip, cost/bonus at levels 0 and 5.
+- [x] Implement Core; compile offline (scripts + tests against nunit).
+- [x] Commit `Add core rules assembly with EditMode tests`.
 
 ### Task 2: Enemy variety
 
@@ -76,7 +76,7 @@
 - Spawner: per-prefab pools (`Dictionary<EnemyBehavior, Queue<EnemyBehavior>>`), weighted pick among `unlockTime <= GameTime`, tint applied via `MaterialPropertyBlock` `_BaseColor`.
 - `EnemySpawner.ActiveEnemies` / `GetClosestEnemy` unchanged.
 
-- [ ] Implement; compile; commit `Add runner, spitter, tank and exploder enemies`.
+- [x] Implement; compile; commit `Add runner, spitter, tank and exploder enemies`.
 
 ### Task 3: Time-based difficulty + recurring bosses + indicator
 
@@ -89,7 +89,7 @@
 - `BossIndicator`: banner "BOSS INCOMING" 2.5 s; red diamond + "BOSS" label clamped to screen edge (60 px margin) while boss off-screen; hidden on-screen or dead. Camera shake on spawn (Task 4 API).
 - `RuntimeUI`: `CreatePanel`, `CreateText`, `CloneButton(template, parent, label, onClick)` (replaces `onClick` event to drop persistent listeners).
 
-- [ ] Implement; compile; commit `Time-based difficulty, recurring bosses and boss indicator`.
+- [x] Implement; compile; commit `Time-based difficulty, recurring bosses and boss indicator`.
 
 ### Task 4: Game feel
 
@@ -100,7 +100,7 @@
 - `EnemyBehavior.TakeDamage(float amount, Vector3 hitDirection)`: red flash 0.08 s via `MaterialPropertyBlock`, knockback 4 u/s decaying ×10/s, divided by scale² (bosses barely move).
 - `DamageNumbers.Show(Vector3 worldPos, float amount)`: pool of 40 TMP texts on HUD canvas, rise 60 px + fade over 0.6 s.
 
-- [ ] Implement; compile; commit `Add damage numbers, hit flash, knockback and screen shake`.
+- [x] Implement; compile; commit `Add damage numbers, hit flash, knockback and screen shake`.
 
 ### Task 5: Magnet, upgrade weights, reroll
 
@@ -108,7 +108,7 @@
 
 **Decisions:** `PlayerManager.PickupRadius` (base 2), `IncreasePickupRadius`; options picked by `WeightedRandom.PickIndices`; 3 rerolls per run (`UpgradeManager.RerollsLeft`, `UpgradeManager.Reroll()`), reroll button cloned from an upgrade item button, hidden at 0.
 
-- [ ] Implement; compile; commit `Add magnet upgrade, weighted options and rerolls`.
+- [x] Implement; compile; commit `Add magnet upgrade, weighted options and rerolls`.
 
 ### Task 6: Meta progression
 
@@ -122,11 +122,11 @@
   - Settings: Music / SFX volume with −/+ (10% steps), persisted, applied live.
 - Game start: character from `Resources/Characters` matching saved name (fallback serialized one); applies `moveSpeed` (sprint = speed + 1), max HP + meta HP, meta speed, meta pickup range, meta damage multiplier on all weapons.
 
-- [ ] Implement; compile; commit `Add coins, permanent upgrades, character select and settings`.
+- [x] Implement; compile; commit `Add coins, permanent upgrades, character select and settings`.
 
 ### Task 7: Integrity tests, headless verification, push
 
 **Files:** Create `Assets/Tests/EditMode/AssetIntegrityTests.cs` (loads every UpgradeData/EnemyData/CharacterData asset via `AssetDatabase`, checks required references through `SerializedObject`; opens `GameScene` and checks `UpgradeManager.m_AvailableUpgrades` and `EnemySpawner.m_EnemyTypes` contain no missing references).
 
-- [ ] Run `unity test <project> --mode EditMode`; fix failures until green.
-- [ ] Commit; merge to `main`; push.
+- [x] Run `unity test <project> --mode EditMode`; fix failures until green.
+- [x] Commit; merge to `main`; push.
