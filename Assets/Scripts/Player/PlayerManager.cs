@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float m_InvisibleTimer;
     [SerializeField] private float m_RotationSpeed = 90f;
     public Transform GunMuzzle => m_GunMuzzle;
+    public bool IsFullHealth => m_Health >= m_MaxHealth;
     private ThirdPersonController m_Controller;
     private float m_Health;
     private float m_MaxHealth;

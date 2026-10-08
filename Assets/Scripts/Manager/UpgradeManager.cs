@@ -16,7 +16,7 @@ public class UpgradeManager : MonoBehaviour
 
     public UpgradeData[] GetUpgradeOptions(int count)
     {
-        List<UpgradeData> options = new List<UpgradeData>(m_AvailableUpgrades);
+        List<UpgradeData> options = m_AvailableUpgrades.FindAll(IsAvailable);
         UpgradeData[] result = new UpgradeData[Mathf.Min(count, options.Count)];
         for (int i = 0; i < result.Length; i++)
         {
@@ -25,6 +25,19 @@ public class UpgradeManager : MonoBehaviour
             options.RemoveAt(index);
         }
         return result;
+    }
+
+    private bool IsAvailable(UpgradeData upgrade)
+    {
+        switch (upgrade.type)
+        {
+            case UpgradeType.Heal:
+                return !m_Player.IsFullHealth;
+            case UpgradeType.AddWeapon:
+                return upgrade.weaponData != null && !m_WeaponSystem.HasWeapon(upgrade.weaponData);
+            default:
+                return true;
+        }
     }
 
     public void ApplyUpgrade(UpgradeData upgrade)

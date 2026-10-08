@@ -85,8 +85,15 @@ public class WeaponSystem : MonoBehaviour
         AudioManager.Instance.PlaySFX(weapon.data.shootSound, position, 0.5f);
     }
 
+    public bool HasWeapon(WeaponData weaponData)
+    {
+        return m_ActiveWeapons.Exists(w => w.data == weaponData);
+    }
+
+    // Weapon stat upgrades apply to every owned weapon
     public void ApplyUpgrade(UpgradeData upgrade)
     {
-        m_ActiveWeapons[0].ApplyUpgrade(upgrade);
+        foreach (var weapon in m_ActiveWeapons)
+            weapon.ApplyUpgrade(upgrade);
     }
 }
