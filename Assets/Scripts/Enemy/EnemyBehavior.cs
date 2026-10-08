@@ -50,11 +50,11 @@ public class EnemyBehavior : MonoBehaviour
     {
         Vector3 direction = (GameManager.Instance.GetPlayerPosition() - transform.position);
         direction.y = 0; // Keep movement in XZ plane
+        if (direction.sqrMagnitude < 0.0001f) return;
         direction.Normalize();
         // transform.position += direction * m_Speed * m_UpdateInterval;
         transform.position += direction * m_Speed * Time.deltaTime;
-        transform.LookAt(GameManager.Instance.GetPlayerPosition());
-        transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
+        transform.rotation = Quaternion.LookRotation(direction);
     }
 
     void OnTriggerStay(Collider other)
@@ -69,7 +69,6 @@ public class EnemyBehavior : MonoBehaviour
     {
         // Already dead (several hits can land in the same physics step)
         if (m_Health <= 0) return;
-        Debug.Log($"{gameObject.name} take damage: {amount}");
         m_Health -= amount;
         if (m_Health <= 0) Die();
         else
@@ -86,9 +85,7 @@ public class EnemyBehavior : MonoBehaviour
         {
             ExpSpawner.Instance.SpawnExpAround(transform.position, 10, 5);
         }
-        ParticleSystem effect = Instantiate(m_DeathEffect, transform.position, Quaternion.identity);
-        effect.Play();
-        Destroy(effect.gameObject, effect.main.duration);
+        EffectPool.Play(m_DeathEffect, transform.position);
         gameObject.SetActive(false);
         EnemySpawner.Instance.ReturnEnemy(this);
     }

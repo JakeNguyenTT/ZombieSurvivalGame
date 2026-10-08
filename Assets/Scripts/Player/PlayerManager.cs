@@ -1,4 +1,3 @@
-using System.Linq;
 using StarterAssets;
 using UnityEngine;
 
@@ -79,28 +78,9 @@ public class PlayerManager : MonoBehaviour
 
     private void LookAtClosestEnemy()
     {
-        // Find all active enemies
-        EnemyBehavior[] activeEnemies = FindObjectsOfType<EnemyBehavior>()
-            .Where(e => e.gameObject.activeInHierarchy).ToArray();
-
-        if (activeEnemies.Length == 0) return; // No enemies, exit
-
-        // Find the closest enemy
-        EnemyBehavior closestEnemy = null;
-        float closestDistance = Mathf.Infinity;
         Vector3 playerPos = transform.position;
-
-        foreach (var enemy in activeEnemies)
-        {
-            float distance = Vector3.Distance(playerPos, enemy.transform.position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closestEnemy = enemy;
-            }
-        }
-
-        if (closestEnemy == null) return; // No valid enemy found
+        EnemyBehavior closestEnemy = EnemySpawner.Instance.GetClosestEnemy(playerPos);
+        if (closestEnemy == null) return; // No enemies
 
         // Calculate direction to the closest enemy
         Vector3 direction = (closestEnemy.transform.position - playerPos).normalized;

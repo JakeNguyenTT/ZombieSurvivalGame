@@ -7,6 +7,7 @@ public class EnemySpawner : MonoBehaviour
     public static EnemySpawner Instance { get; private set; }
     [SerializeField] private List<EnemyData> m_EnemyTypes;
     private Queue<EnemyBehavior> m_EnemyPool = new Queue<EnemyBehavior>();
+    private readonly List<EnemyBehavior> m_ActiveEnemies = new List<EnemyBehavior>();
 
     [SerializeField] private float m_SpawnRange = 25f;
 
@@ -102,15 +103,33 @@ public class EnemySpawner : MonoBehaviour
             enemy.Initialize(spawnPos, enemyType, enemyEnhancement);
         }
         enemy.gameObject.SetActive(true);
-        m_CurrentActiveEnemies++;
+        m_ActiveEnemies.Add(enemy);
+        m_CurrentActiveEnemies = m_ActiveEnemies.Count;
     }
 
     public void ReturnEnemy(EnemyBehavior enemy)
     {
         enemy.gameObject.SetActive(false);
         m_EnemyPool.Enqueue(enemy);
-        m_CurrentActiveEnemies--;
+        m_ActiveEnemies.Remove(enemy);
+        m_CurrentActiveEnemies = m_ActiveEnemies.Count;
         GameManager.Instance.KillEnemy();
+    }
+
+    public EnemyBehavior GetClosestEnemy(Vector3 position)
+    {
+        EnemyBehavior closest = null;
+        float closestSqrDistance = float.MaxValue;
+        foreach (var enemy in m_ActiveEnemies)
+        {
+            float sqrDistance = (enemy.transform.position - position).sqrMagnitude;
+            if (sqrDistance < closestSqrDistance)
+            {
+                closestSqrDistance = sqrDistance;
+                closest = enemy;
+            }
+        }
+        return closest;
     }
 }
 

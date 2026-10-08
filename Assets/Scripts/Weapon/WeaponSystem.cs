@@ -58,7 +58,6 @@ public class WeaponSystem : MonoBehaviour
 
     public void FireMainWeapon(Vector3 position)
     {
-        Debug.Log("<color=red>Fire Main Weapon</color>");
         FireSingle(position, m_ActiveWeapons[0]);
     }
 

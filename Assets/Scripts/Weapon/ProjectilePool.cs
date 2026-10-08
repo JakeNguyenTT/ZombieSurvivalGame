@@ -1,22 +1,19 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 
 public class ProjectilePool : MonoBehaviour
 {
     public static ProjectilePool Instance;
     [SerializeField] private int initialPoolSize = 20;
+    [Header("Read Only")]
     [SerializeField] private List<ProjectileData> m_ProjectileDatas = new List<ProjectileData>();
     private Dictionary<string, Queue<Projectile>> pools = new Dictionary<string, Queue<Projectile>>();
+    private Dictionary<string, ProjectileData> m_DataByName = new Dictionary<string, ProjectileData>();
 
     private void Awake()
     {
         Instance = this;
-    }
-
-    void Start()
-    {
-        m_ProjectileDatas = new List<ProjectileData>();
+        m_ProjectileDatas.Clear();
     }
 
     public Projectile GetProjectile(Projectile prefab)
@@ -24,6 +21,9 @@ public class ProjectilePool : MonoBehaviour
         if (!pools.ContainsKey(prefab.name))
         {
             pools[prefab.name] = new Queue<Projectile>();
+            var data = new ProjectileData { ProjectileName = prefab.name };
+            m_DataByName[prefab.name] = data;
+            m_ProjectileDatas.Add(data);
             Preload(prefab, initialPoolSize);
         }
 
@@ -31,7 +31,7 @@ public class ProjectilePool : MonoBehaviour
         if (pool.Count == 0) Preload(prefab, initialPoolSize / 2);
 
         Projectile proj = pool.Dequeue();
-        m_ProjectileDatas.Find(data => data.ProjectileName == prefab.name).currentPoolSize = pool.Count;
+        m_DataByName[prefab.name].currentPoolSize = pool.Count;
         return proj;
     }
 
@@ -44,8 +44,8 @@ public class ProjectilePool : MonoBehaviour
             proj.name = prefab.name;
             proj.gameObject.SetActive(false);
             pools[prefab.name].Enqueue(proj);
-            m_ProjectileDatas.Add(new ProjectileData { ProjectileName = prefab.name, currentPoolSize = pools[prefab.name].Count });
         }
+        m_DataByName[prefab.name].currentPoolSize = pools[prefab.name].Count;
     }
 
     public void ReturnProjectile(Projectile proj)
@@ -53,7 +53,7 @@ public class ProjectilePool : MonoBehaviour
         if (proj == null) return;
         // Return to pool
         pools[proj.name].Enqueue(proj);
-        m_ProjectileDatas.Find(data => data.ProjectileName == proj.name).currentPoolSize = pools[proj.name].Count;
+        m_DataByName[proj.name].currentPoolSize = pools[proj.name].Count;
     }
 }
 
@@ -63,4 +63,3 @@ public class ProjectileData
     public string ProjectileName;
     public int currentPoolSize;
 }
-

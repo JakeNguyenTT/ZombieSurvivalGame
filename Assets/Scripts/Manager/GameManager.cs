@@ -44,8 +44,11 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         if (!m_IsPlaying) return;
+        int previousSecond = (int)m_GameTime;
         m_GameTime += Time.deltaTime;
-        m_UIManager.UpdateTime(m_GameTime);
+        // Only rebuild the time string when the displayed second changes
+        if ((int)m_GameTime != previousSecond)
+            m_UIManager.UpdateTime(m_GameTime);
     }
 
     public void StartGame()

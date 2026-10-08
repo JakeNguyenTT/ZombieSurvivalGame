@@ -8,14 +8,14 @@ public class ExperienceGem : MonoBehaviour
     void Update()
     {
         Vector3 playerPos = GameManager.Instance.GetPlayerPosition();
-        float distance = Vector3.Distance(transform.position, playerPos);
-        if (distance < 2f)
+        float sqrDistance = (transform.position - playerPos).sqrMagnitude;
+        if (sqrDistance < 2f * 2f)
         {
             transform.position = Vector3.MoveTowards(transform.position, playerPos, m_Speed * Time.deltaTime);
-            if (distance < 0.1f)
+            if (sqrDistance < 0.1f * 0.1f)
             {
                 ExperienceManager.Instance.AddExperience(m_ExpValue);
-                Destroy(gameObject);
+                ExpSpawner.Instance.ReturnGem(this);
             }
         }
     }

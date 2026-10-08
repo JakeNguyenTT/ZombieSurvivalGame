@@ -19,6 +19,8 @@ public class AudioManager : MonoBehaviour
     [Header("SFX")]
     [SerializeField] private AudioSource m_SFXPrefab;
     [SerializeField] private int m_SFXPoolInitSize = 10;
+    [SerializeField] private int m_MaxSameClipInstances = 4; // skip a clip once this many copies are playing
+    private readonly Dictionary<AudioClip, int> m_ActiveClipCounts = new Dictionary<AudioClip, int>();
     [SerializeField] private Queue<AudioSource> m_SFXPool;
     [SerializeField] private List<AudioSource> m_ActiveLoopingSFX;
 
@@ -107,6 +109,10 @@ public class AudioManager : MonoBehaviour
             Debug.LogError("SFX is missing");
             return;
         }
+        m_ActiveClipCounts.TryGetValue(clip, out int playing);
+        if (playing >= m_MaxSameClipInstances) return;
+        m_ActiveClipCounts[clip] = playing + 1;
+
         float targetVolume = volume * m_SFXVolume;
         if (m_SFXPool.Count == 0)
             AddSFXToPool();
@@ -121,7 +127,8 @@ public class AudioManager : MonoBehaviour
     {
         var audioData = m_AudioLibrary.GetItem(audioId);
         if (audioData == null) return;
-        PlaySFX(audioData.clip, position, audioData.volume * m_SFXVolume * volume, pitch, spatial);
+        // m_SFXVolume is applied inside PlaySFX(AudioClip, ...)
+        PlaySFX(audioData.clip, position, audioData.volume * volume, pitch, spatial);
     }
 
     private void SetupSource(AudioSource source, AudioClip clip, Vector3 position, float volume, float pitch, bool spatial, bool loop)
@@ -148,6 +155,8 @@ public class AudioManager : MonoBehaviour
     {
         source.Stop();
         source.loop = false;
+        if (source.clip != null && m_ActiveClipCounts.TryGetValue(source.clip, out int playing))
+            m_ActiveClipCounts[source.clip] = Mathf.Max(0, playing - 1);
         source.clip = null;
         source.gameObject.SetActive(false);
         m_SFXPool.Enqueue(source);

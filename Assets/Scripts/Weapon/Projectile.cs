@@ -76,9 +76,7 @@ public class Projectile : MonoBehaviour
 
     private void PlayHitEffect()
     {
-        ParticleSystem effect = Instantiate(m_HitEffect, transform.position, Quaternion.identity);
-        effect.Play();
-        Destroy(effect.gameObject, effect.main.duration);
+        EffectPool.Play(m_HitEffect, transform.position);
     }
 
     private void ReturnToPool()
