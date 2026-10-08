@@ -57,10 +57,9 @@ public class AudioManager : MonoBehaviour
     public void PlayBGM(AudioID audioId, bool fade = false, float fadeDuration = 1f)
     {
         AudioData config = m_AudioLibrary.GetItem(audioId);
-
-        float targetVolume = config.volume * m_MusicVolume;
         if (config != null && config.isBGM)
         {
+            float targetVolume = config.volume * m_MusicVolume;
             if (fade)
             {
                 FadeBGM(config.clip, targetVolume, fadeDuration);

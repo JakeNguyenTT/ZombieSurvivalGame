@@ -7,6 +7,7 @@ public class WeaponInstance
     public float fireRate;
     public float damage;
     public float range;
+    public float projectileSpeed;
     public int ammoCapacity;
     public int currentAmmo;
     public int spreadCount;
@@ -21,6 +22,7 @@ public class WeaponInstance
         fireRate = weaponData.fireRate;
         damage = weaponData.damage;
         range = weaponData.range;
+        projectileSpeed = weaponData.projectileSpeed;
         ammoCapacity = weaponData.maxAmmo;
         currentAmmo = ammoCapacity;
         penetrationCount = weaponData.penetration;
@@ -45,6 +47,9 @@ public class WeaponInstance
                 break;
             case UpgradeType.Penetration:
                 penetrationCount += Mathf.FloorToInt(upgrade.value);
+                break;
+            case UpgradeType.ProjectileSpeed:
+                projectileSpeed *= 1f + upgrade.value;
                 break;
         }
         // Debug.Log($"Upgraded {data.weaponName}: Damage={damage}, FireRate={fireRate}, Ammo={currentAmmo}/{ammoCapacity}, Penetration={penetrationCount}");

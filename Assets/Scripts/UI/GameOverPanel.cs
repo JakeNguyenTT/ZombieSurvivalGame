@@ -10,12 +10,14 @@ public class GameOverPanel : MonoBehaviour
 
     public void OnButtonMenu()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene("MenuScene");
     }
 
     public void OnButtonPlayAgain()
     {
+        // The reloaded scene's GameManager calls StartGame() itself
+        Time.timeScale = 1;
         SceneManager.LoadScene("GameScene");
-        GameManager.Instance.StartGame();
     }
 }

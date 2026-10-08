@@ -59,6 +59,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         // Implement game over logic (e.g., show UI, stop spawning)
+        m_IsPlaying = false;
         Time.timeScale = 0;
         m_EnemySpawner.StopSpawning();
         OnGameOver?.Invoke(m_GameTime);

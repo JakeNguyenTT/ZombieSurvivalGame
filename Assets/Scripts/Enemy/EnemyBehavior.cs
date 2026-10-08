@@ -29,7 +29,7 @@ public class EnemyBehavior : MonoBehaviour
     {
         // boss is 10 times bigger
         Initialize(position, data, enhancement);
-        m_Speed = data.speed - 1;
+        m_Speed = Mathf.Max(0.5f, data.speed - 1);
         m_Health = data.health * 10 * bossLevel;
         m_Damage = data.damage * 5 * bossLevel;
         transform.localScale = Vector3.one * 5;
@@ -67,6 +67,8 @@ public class EnemyBehavior : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        // Already dead (several hits can land in the same physics step)
+        if (m_Health <= 0) return;
         Debug.Log($"{gameObject.name} take damage: {amount}");
         m_Health -= amount;
         if (m_Health <= 0) Die();

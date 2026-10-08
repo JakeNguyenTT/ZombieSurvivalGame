@@ -7,11 +7,13 @@ public class WeaponSystem : MonoBehaviour
     [Header("Read Only")]
     [SerializeField] private List<WeaponInstance> m_ActiveWeapons = new List<WeaponInstance>();
     [SerializeField] private Transform m_PlayerTransform;
+    private Transform m_Muzzle;
 
     public void Initialize(WeaponData startingWeapon, Transform playerTransform)
     {
         m_PlayerTransform = playerTransform;
-        AddWeapon(startingWeapon, m_PlayerTransform.GetComponent<PlayerManager>().GunMuzzle);
+        m_Muzzle = m_PlayerTransform.GetComponent<PlayerManager>().GunMuzzle;
+        AddWeapon(startingWeapon, m_Muzzle);
     }
 
     public void Tick(float deltaTime)
@@ -22,14 +24,14 @@ public class WeaponSystem : MonoBehaviour
             if (weapon.timer <= 0)
             {
                 FireWeapon(weapon);
-                weapon.timer = weapon.data.fireRate;
+                weapon.timer = weapon.fireRate;
             }
         }
     }
 
     public void AddWeapon(WeaponData weaponData)
     {
-        AddWeapon(weaponData, m_PlayerTransform);
+        AddWeapon(weaponData, m_Muzzle != null ? m_Muzzle : m_PlayerTransform);
     }
 
     public void AddWeapon(WeaponData weaponData, Transform muzzle)
@@ -45,6 +47,7 @@ public class WeaponSystem : MonoBehaviour
         switch (weapon.data.firingType)
         {
             case FiringType.Single:
+            case FiringType.Automatic:
                 FireSingle(position, weapon);
                 break;
             case FiringType.Spread:
@@ -80,6 +83,7 @@ public class WeaponSystem : MonoBehaviour
             Projectile proj = m_ProjectilePool.GetProjectile(weapon.data.projectilePrefab);
             proj.Initialize(position, direction, weapon);
         }
+        AudioManager.Instance.PlaySFX(weapon.data.shootSound, position, 0.5f);
     }
 
     public void ApplyUpgrade(UpgradeData upgrade)

@@ -41,8 +41,17 @@ public class UpgradeManager : MonoBehaviour
             case UpgradeType.Speed:
                 m_Player.IncreaseSpeed(upgrade.value);
                 break;
+            case UpgradeType.AddWeapon:
+                if (upgrade.weaponData != null)
+                    m_WeaponSystem.AddWeapon(upgrade.weaponData);
+                else
+                    Debug.LogWarning($"Upgrade {upgrade.name} has no weaponData");
+                break;
             case UpgradeType.Penetration:
             case UpgradeType.Damage:
+            case UpgradeType.FireRate:
+            case UpgradeType.ProjectileSpeed:
+            case UpgradeType.MaxAmmo:
                 m_WeaponSystem.ApplyUpgrade(upgrade);
                 break;
         }

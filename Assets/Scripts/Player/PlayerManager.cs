@@ -1,4 +1,5 @@
 using System.Linq;
+using StarterAssets;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
@@ -13,13 +14,14 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float m_InvisibleTimer;
     [SerializeField] private float m_RotationSpeed = 90f;
     public Transform GunMuzzle => m_GunMuzzle;
-    private float m_MoveSpeed;
+    private ThirdPersonController m_Controller;
     private float m_Health;
     private float m_MaxHealth;
 
     void Awake()
     {
         Instance = this;
+        m_Controller = GetComponentInParent<ThirdPersonController>();
     }
 
     void Start()
@@ -68,7 +70,12 @@ public class PlayerManager : MonoBehaviour
         UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
     }
 
-    public void IncreaseSpeed(float amount) => m_MoveSpeed += amount;
+    public void IncreaseSpeed(float amount)
+    {
+        if (m_Controller == null) return;
+        m_Controller.MoveSpeed += amount;
+        m_Controller.SprintSpeed += amount;
+    }
 
     private void LookAtClosestEnemy()
     {

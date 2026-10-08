@@ -7,12 +7,13 @@ public class PausePanel : MonoBehaviour
 {
     public void OnButtonMenu()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene("MenuScene");
     }
 
     public void OnButtonResume()
     {
-        Time.timeScale = 1;
+        GameManager.Instance.ResumeGame();
         gameObject.SetActive(false);
         UIManager.Instance.HideFadeBackground();
     }
