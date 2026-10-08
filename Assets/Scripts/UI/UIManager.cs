@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameOverPanel m_GameOverPanel;
     [SerializeField] private Image m_FadeBackground;
     [SerializeField] private TextMeshProUGUI m_GameOverTimeText;
+    private TextMeshProUGUI m_RunStatsText;
 
     void Awake()
     {
@@ -78,11 +79,32 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.ResumeGame();
     }
 
-    private void ShowGameOver(float time)
+    private void ShowGameOver(RunResult result)
     {
         m_FadeBackground.gameObject.SetActive(true);
         m_GameOverPanel.gameObject.SetActive(true);
-        m_GameOverTimeText.text = $" {FormatTime(time)}";
+        m_GameOverTimeText.text = $" {FormatTime(result.Time)}";
+
+        if (m_RunStatsText == null) CreateRunStatsText();
+        string best = result.NewBestTime ? "\nNew best time!" : result.NewBestKills ? "\nNew best kills!" : "";
+        m_RunStatsText.text =
+            $"Kills {result.Kills}   Level {result.Level}   Bosses {result.Bosses}\n" +
+            $"+{result.Coins} coins (total {SaveData.Coins}){best}";
+    }
+
+    // Copy of the time text (same font and style) centered between the time row and the buttons
+    private void CreateRunStatsText()
+    {
+        m_RunStatsText = Instantiate(m_GameOverTimeText, m_GameOverPanel.transform);
+        m_RunStatsText.name = "RunStatsText";
+        var layoutElement = m_RunStatsText.GetComponent<LayoutElement>();
+        if (layoutElement == null) layoutElement = m_RunStatsText.gameObject.AddComponent<LayoutElement>();
+        layoutElement.ignoreLayout = true;
+        m_RunStatsText.enableAutoSizing = false;
+        m_RunStatsText.fontSize = 34;
+        m_RunStatsText.alignment = TextAlignmentOptions.Center;
+        m_RunStatsText.overflowMode = TextOverflowModes.Overflow;
+        RuntimeUI.Place(m_RunStatsText.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0, 10), new Vector2(760, 140));
     }
 
     private string FormatTime(float time) => RuntimeUI.FormatTime(time);

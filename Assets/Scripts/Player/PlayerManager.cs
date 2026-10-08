@@ -28,7 +28,16 @@ public class PlayerManager : MonoBehaviour
 
     void Start()
     {
-        m_MaxHealth = m_Health = m_CharacterData.maxHealth;
+        // Selected character plus permanent upgrades bought in the menu
+        m_CharacterData = CharacterRoster.Selected(m_CharacterData);
+        m_MaxHealth = m_Health = m_CharacterData.maxHealth + SaveData.MetaBonus(MetaStat.MaxHealth);
+        m_PickupRadius += SaveData.MetaBonus(MetaStat.PickupRange);
+        if (m_Controller != null)
+        {
+            m_Controller.MoveSpeed = m_CharacterData.moveSpeed + SaveData.MetaBonus(MetaStat.MoveSpeed);
+            m_Controller.SprintSpeed = m_Controller.MoveSpeed + 1f;
+        }
+        m_WeaponSystem.DamageMultiplier = 1f + SaveData.MetaBonus(MetaStat.Damage);
         m_WeaponSystem.Initialize(m_CharacterData.startingWeapon, transform);
         if (m_MainCamera == null) m_MainCamera = Camera.main;
         UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);

@@ -23,6 +23,7 @@ public class AudioManager : MonoBehaviour
     private readonly Dictionary<AudioClip, int> m_ActiveClipCounts = new Dictionary<AudioClip, int>();
     [SerializeField] private Queue<AudioSource> m_SFXPool;
     [SerializeField] private List<AudioSource> m_ActiveLoopingSFX;
+    private AudioData m_CurrentBGM;
 
     void Awake()
     {
@@ -37,6 +38,30 @@ public class AudioManager : MonoBehaviour
         m_MusicSource.loop = true;
         m_AudioLibrary.Init();
         InitSFXPool();
+
+        // Saved settings override the inspector defaults
+        m_MusicVolume = SaveData.GetMusicVolume(m_MusicVolume);
+        m_SFXVolume = SaveData.GetSfxVolume(m_SFXVolume);
+    }
+
+    public float MusicVolume => m_MusicVolume;
+    public float SfxVolume => m_SFXVolume;
+
+    public void SetMusicVolume(float volume)
+    {
+        m_MusicVolume = Mathf.Clamp01(volume);
+        SaveData.SetMusicVolume(m_MusicVolume);
+        if (m_CurrentBGM != null)
+        {
+            m_MusicSource.DOKill();
+            m_MusicSource.volume = m_CurrentBGM.volume * m_MusicVolume;
+        }
+    }
+
+    public void SetSFXVolume(float volume)
+    {
+        m_SFXVolume = Mathf.Clamp01(volume);
+        SaveData.SetSfxVolume(m_SFXVolume);
     }
 
     private void InitSFXPool()
@@ -61,6 +86,7 @@ public class AudioManager : MonoBehaviour
         AudioData config = m_AudioLibrary.GetItem(audioId);
         if (config != null && config.isBGM)
         {
+            m_CurrentBGM = config;
             float targetVolume = config.volume * m_MusicVolume;
             if (fade)
             {

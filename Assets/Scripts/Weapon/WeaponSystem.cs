@@ -9,6 +9,9 @@ public class WeaponSystem : MonoBehaviour
     [SerializeField] private Transform m_PlayerTransform;
     private Transform m_Muzzle;
 
+    // Permanent damage bonus applied to every weapon when it is added
+    public float DamageMultiplier { get; set; } = 1f;
+
     public void Initialize(WeaponData startingWeapon, Transform playerTransform)
     {
         m_PlayerTransform = playerTransform;
@@ -38,6 +41,7 @@ public class WeaponSystem : MonoBehaviour
     {
         WeaponInstance weapon = new WeaponInstance();
         weapon.Initialize(weaponData, muzzle);
+        weapon.damage *= DamageMultiplier;
         m_ActiveWeapons.Add(weapon);
     }
 

@@ -12,7 +12,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private EnemySpawner m_EnemySpawner;
     [SerializeField] private UIManager m_UIManager;
     [SerializeField] private AudioManager m_AudioManager;
-    public event Action<float> OnGameOver;
+    public event Action<RunResult> OnGameOver;
+    private bool m_IsGameOver;
     private int m_EnemyKilled;
     private float m_GameTime;
     private bool m_IsPlaying;
@@ -61,11 +62,32 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        // Implement game over logic (e.g., show UI, stop spawning)
+        if (m_IsGameOver) return;
+        m_IsGameOver = true;
         m_IsPlaying = false;
         Time.timeScale = 0;
         m_EnemySpawner.StopSpawning();
-        OnGameOver?.Invoke(m_GameTime);
+        OnGameOver?.Invoke(RecordRun());
+    }
+
+    // Awards coins and updates personal bests
+    private RunResult RecordRun()
+    {
+        int bosses = m_EnemySpawner.BossesKilled;
+        var result = new RunResult
+        {
+            Time = m_GameTime,
+            Kills = m_EnemyKilled,
+            Level = ExperienceManager.Instance.CurrentLevel,
+            Bosses = bosses,
+            Coins = RunRewards.Coins(m_EnemyKilled, m_GameTime, bosses),
+            NewBestTime = m_GameTime > SaveData.BestTime,
+            NewBestKills = m_EnemyKilled > SaveData.BestKills,
+        };
+        if (result.NewBestTime) SaveData.BestTime = m_GameTime;
+        if (result.NewBestKills) SaveData.BestKills = m_EnemyKilled;
+        SaveData.Coins += result.Coins;
+        return result;
     }
 
     public void PauseGame()

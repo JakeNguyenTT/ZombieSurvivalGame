@@ -15,7 +15,9 @@ public class UpgradePanel : MonoBehaviour
     public void CreateRerollButton(Button template)
     {
         m_RerollButton = RuntimeUI.CloneButton(template, transform, "Reroll", OnButtonReroll);
-        m_RerollButton.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        var layoutElement = m_RerollButton.GetComponent<LayoutElement>();
+        if (layoutElement == null) layoutElement = m_RerollButton.gameObject.AddComponent<LayoutElement>();
+        layoutElement.ignoreLayout = true;
         var rect = (RectTransform)m_RerollButton.transform;
         RuntimeUI.Place(rect, new Vector2(0.5f, 0f), new Vector2(0, 90), new Vector2(320, 90));
         UpdateRerollButton();

@@ -11,6 +11,7 @@ public class ExperienceManager : MonoBehaviour
     [SerializeField] private int m_CurrentLevel;
 
     public event Action<UpgradeData[]> OnLevelUp;
+    public int CurrentLevel => m_CurrentLevel;
 
     void Awake()
     {
