@@ -51,6 +51,7 @@ public class UIManager : MonoBehaviour
         RuntimeHUD = RuntimeUI.CreateRect(panelParent, "RuntimeHUD");
         RuntimeUI.Stretch(RuntimeHUD);
         RuntimeHUD.SetSiblingIndex(m_FadeBackground.transform.GetSiblingIndex());
+        RuntimeHUD.gameObject.AddComponent<DamageNumbers>().Init(RuntimeHUD, HudFont);
         RuntimeHUD.gameObject.AddComponent<BossIndicator>().Init(RuntimeHUD, HudFont);
     }
 

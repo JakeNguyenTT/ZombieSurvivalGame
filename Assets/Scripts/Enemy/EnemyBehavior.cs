@@ -4,6 +4,10 @@ public class EnemyBehavior : MonoBehaviour
 {
     private const float ExploderTriggerDistance = 1.5f;
     private const float FuseBlinkInterval = 0.1f;
+    private const float FlashDuration = 0.08f;
+    private const float KnockbackSpeed = 4f;
+    private const float KnockbackDamping = 10f;
+    private static readonly Color FlashColor = new Color(1f, 0.3f, 0.3f, 1f);
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
     [SerializeField] private float m_Speed = 2f;
@@ -17,6 +21,8 @@ public class EnemyBehavior : MonoBehaviour
     private MaterialPropertyBlock m_PropertyBlock;
     private float m_AttackTimer;
     private float m_FuseTimer = -1f;
+    private float m_FlashTimer;
+    private Vector3 m_Knockback;
 
     public EnemyBehavior SourcePrefab { get; set; }
     public EnemyData Data => m_Data;
@@ -41,6 +47,8 @@ public class EnemyBehavior : MonoBehaviour
         m_IsBoss = false;
         m_AttackTimer = data.attackCooldown;
         m_FuseTimer = -1f;
+        m_FlashTimer = 0f;
+        m_Knockback = Vector3.zero;
         SetColor(data.tint);
     }
 
@@ -56,6 +64,8 @@ public class EnemyBehavior : MonoBehaviour
 
     void Update()
     {
+        UpdateHitFeedback();
+
         Vector3 toPlayer = GameManager.Instance.GetPlayerPosition() - transform.position;
         toPlayer.y = 0; // Keep movement in XZ plane
         float distance = toPlayer.magnitude;
@@ -74,6 +84,21 @@ public class EnemyBehavior : MonoBehaviour
             default:
                 Move(direction);
                 break;
+        }
+    }
+
+    private void UpdateHitFeedback()
+    {
+        if (m_Knockback.sqrMagnitude > 0.0001f)
+        {
+            transform.position += m_Knockback * Time.deltaTime;
+            m_Knockback *= Mathf.Exp(-KnockbackDamping * Time.deltaTime);
+        }
+
+        if (m_FlashTimer > 0)
+        {
+            m_FlashTimer -= Time.deltaTime;
+            if (m_FlashTimer <= 0 && m_FuseTimer < 0) SetColor(m_Data.tint);
         }
     }
 
@@ -119,6 +144,7 @@ public class EnemyBehavior : MonoBehaviour
         toPlayer.y = 0;
         if (toPlayer.magnitude <= m_Data.explodeRadius)
             PlayerManager.Instance.TakeDamage(m_Damage);
+        if (CameraController.Instance != null) CameraController.Instance.Shake(0.4f, 0.3f);
         Die();
     }
 
@@ -132,11 +158,25 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(float amount, Vector3 hitDirection = default)
     {
         // Already dead (several hits can land in the same physics step)
         if (m_Health <= 0) return;
         m_Health -= amount;
+        DamageNumbers.Show(transform.position + Vector3.up * 2f * transform.localScale.y, amount);
+
+        // Big enemies barely move
+        hitDirection.y = 0;
+        float size = transform.localScale.x;
+        if (hitDirection.sqrMagnitude > 0.0001f)
+            m_Knockback += hitDirection.normalized * KnockbackSpeed / (size * size);
+
+        if (m_FuseTimer < 0)
+        {
+            SetColor(FlashColor);
+            m_FlashTimer = FlashDuration;
+        }
+
         if (m_Health <= 0) Die();
         else
         {

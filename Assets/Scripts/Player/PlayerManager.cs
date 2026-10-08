@@ -43,8 +43,10 @@ public class PlayerManager : MonoBehaviour
     }
     public void TakeDamage(float amount)
     {
-        if (m_InvisibleTimer > 0) return;
+        // Dead already, or invulnerable after a recent hit
+        if (m_Health <= 0 || m_InvisibleTimer > 0) return;
         m_Health -= amount;
+        if (CameraController.Instance != null) CameraController.Instance.Shake(0.15f, 0.15f);
         UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
         if (m_Health <= 0)
         {

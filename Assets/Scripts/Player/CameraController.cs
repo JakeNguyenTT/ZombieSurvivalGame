@@ -2,6 +2,14 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public static CameraController Instance { get; private set; }
+
+    // Screen shake state; the follow position is kept separately so shake never drifts the camera
+    private Vector3 m_BasePosition;
+    private float m_ShakeStrength;
+    private float m_ShakeDuration;
+    private float m_ShakeTimer;
+
     // Player reference and initial offset (used for initialization)
     [SerializeField] private Transform m_Player;
     [SerializeField] private Vector3 m_Offset = new Vector3(0, 10, -10);
@@ -35,6 +43,22 @@ public class CameraController : MonoBehaviour
 
         // Set initial position to match the original behavior
         transform.position = m_Player.position + m_Offset;
+        m_BasePosition = transform.position;
+    }
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    // A stronger shake replaces a weaker one; a weaker one never cuts a stronger one short
+    public void Shake(float strength, float duration)
+    {
+        float currentStrength = m_ShakeTimer > 0 ? m_ShakeStrength * (m_ShakeTimer / m_ShakeDuration) : 0f;
+        if (strength < currentStrength) return;
+        m_ShakeStrength = strength;
+        m_ShakeDuration = duration;
+        m_ShakeTimer = duration;
     }
 
     void Update()
@@ -64,9 +88,17 @@ public class CameraController : MonoBehaviour
         Vector3 desiredPosition = m_Player.position - direction * m_Distance;
 
         // Smoothly move camera to the desired position
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, m_FollowSpeed * Time.deltaTime);
+        m_BasePosition = Vector3.Lerp(m_BasePosition, desiredPosition, m_FollowSpeed * Time.deltaTime);
+        transform.position = m_BasePosition;
 
         // Look at a point above the player for better framing
         transform.LookAt(m_Player.position + Vector3.up * m_LookHeight);
+
+        if (m_ShakeTimer > 0)
+        {
+            m_ShakeTimer -= Time.deltaTime;
+            float falloff = Mathf.Clamp01(m_ShakeTimer / m_ShakeDuration);
+            transform.position = m_BasePosition + Random.insideUnitSphere * m_ShakeStrength * falloff;
+        }
     }
 }

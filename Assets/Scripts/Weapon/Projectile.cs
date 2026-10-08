@@ -56,7 +56,7 @@ public class Projectile : MonoBehaviour
         if (!m_IsActive) return;
         if (other.CompareTag("Enemy") && other.TryGetComponent(out EnemyBehavior enemy))
         {
-            enemy.TakeDamage(m_Damage);
+            enemy.TakeDamage(m_Damage, m_Direction);
             PlayHitEffect();
             m_CurrentPenetrations++;
             if (m_CurrentPenetrations > m_MaxPenetrations)
