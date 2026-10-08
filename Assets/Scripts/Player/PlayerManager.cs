@@ -12,7 +12,9 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private float m_InvisibleTime = 1f;
     [SerializeField] private float m_InvisibleTimer;
     [SerializeField] private float m_RotationSpeed = 90f;
+    [SerializeField] private float m_PickupRadius = 2f;
     public Transform GunMuzzle => m_GunMuzzle;
+    public float PickupRadius => m_PickupRadius;
     public bool IsFullHealth => m_Health >= m_MaxHealth;
     private ThirdPersonController m_Controller;
     private float m_Health;
@@ -78,6 +80,8 @@ public class PlayerManager : MonoBehaviour
         m_Controller.MoveSpeed += amount;
         m_Controller.SprintSpeed += amount;
     }
+
+    public void IncreasePickupRadius(float amount) => m_PickupRadius += amount;
 
     private void LookAtClosestEnemy()
     {

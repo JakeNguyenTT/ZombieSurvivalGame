@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UpgradePanel : MonoBehaviour
 {
@@ -8,6 +9,31 @@ public class UpgradePanel : MonoBehaviour
     [SerializeField] private Transform m_UpgradeItemContainer;
     private List<UpgradeItem> m_UpgradeItems = new List<UpgradeItem>();
     private int m_PoolSize = 3;
+    private Button m_RerollButton;
+
+    // Built at runtime from an existing button so it matches the scene's style
+    public void CreateRerollButton(Button template)
+    {
+        m_RerollButton = RuntimeUI.CloneButton(template, transform, "Reroll", OnButtonReroll);
+        m_RerollButton.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        var rect = (RectTransform)m_RerollButton.transform;
+        RuntimeUI.Place(rect, new Vector2(0.5f, 0f), new Vector2(0, 90), new Vector2(320, 90));
+        UpdateRerollButton();
+    }
+
+    private void OnButtonReroll()
+    {
+        if (UpgradeManager.Instance.TryReroll(out var options))
+            Initialize(options);
+    }
+
+    private void UpdateRerollButton()
+    {
+        if (m_RerollButton == null) return;
+        int rerolls = UpgradeManager.Instance.RerollsLeft;
+        RuntimeUI.SetLabel(m_RerollButton, $"Reroll ({rerolls})");
+        m_RerollButton.gameObject.SetActive(rerolls > 0);
+    }
 
     private void Awake()
     {
@@ -39,6 +65,7 @@ public class UpgradePanel : MonoBehaviour
             upgradeItem.Setup(upgrade);
             upgradeItem.gameObject.SetActive(true);
         }
+        UpdateRerollButton();
     }
 
     private UpgradeItem GetUpgradeItem()

@@ -53,6 +53,10 @@ public class UIManager : MonoBehaviour
         RuntimeHUD.SetSiblingIndex(m_FadeBackground.transform.GetSiblingIndex());
         RuntimeHUD.gameObject.AddComponent<DamageNumbers>().Init(RuntimeHUD, HudFont);
         RuntimeHUD.gameObject.AddComponent<BossIndicator>().Init(RuntimeHUD, HudFont);
+
+        Button buttonTemplate = m_PausePanel.GetComponentInChildren<Button>(true);
+        if (buttonTemplate != null)
+            m_UpgradePanel.CreateRerollButton(buttonTemplate);
     }
 
     public void UpdateHealth(float health, float maxHealth) => m_HealthBar.SetValue(health, maxHealth);

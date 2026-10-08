@@ -7,6 +7,7 @@ public class UpgradeData : ScriptableObject
     public float value;
     public string description;
     public WeaponData weaponData;
+    [Min(0)] public float weight = 1f; // relative chance of being offered on level-up
 }
 
 public enum UpgradeType
@@ -20,4 +21,5 @@ public enum UpgradeType
     FireRate,
     ProjectileSpeed,
     MaxAmmo,
+    Magnet,
 }
