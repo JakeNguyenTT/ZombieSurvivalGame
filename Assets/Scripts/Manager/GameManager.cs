@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     public void SkipToBoss()
     {
-        m_EnemyKilled = 20;
+        m_EnemySpawner.SpawnBossNow();
     }
 
     public Vector3 GetPlayerPosition() => m_Player.transform.position;

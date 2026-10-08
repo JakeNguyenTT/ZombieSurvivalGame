@@ -84,7 +84,7 @@
 
 **Decisions:**
 - Spawn loop uses `Difficulty.SpawnInterval/SpawnBatch(GameTime)`; enemy HP/damage scaled by `HealthMultiplier/DamageMultiplier`. Kill-count difficulty removed.
-- Boss when `Difficulty.BossLevelAt(GameTime)` increases: base type `m_EnemyTypes[0]`, HP = base × 10 × level × HealthMultiplier, damage × 5 × level, scale 5, drops 10 extra gems. `EnemySpawner.OnBossSpawned(EnemyBehavior)`, `EnemySpawner.BossesKilled`.
+- Boss when `Difficulty.BossLevelAt(GameTime)` increases: base type `m_EnemyTypes[0]`, HP = base × 10 × level × HealthMultiplier, damage × (2 + level) (one-shot-proof), scale 5, drops 10 extra gems. `EnemySpawner.OnBossSpawned(EnemyBehavior)`, `EnemySpawner.BossesKilled`.
 - `EnemySpawner.SpawnBossNow()` for `DebugManager`/`GameManager.SkipToBoss`.
 - `BossIndicator`: banner "BOSS INCOMING" 2.5 s; red diamond + "BOSS" label clamped to screen edge (60 px margin) while boss off-screen; hidden on-screen or dead. Camera shake on spawn (Task 4 API).
 - `RuntimeUI`: `CreatePanel`, `CreateText`, `CloneButton(template, parent, label, onClick)` (replaces `onClick` event to drop persistent listeners).

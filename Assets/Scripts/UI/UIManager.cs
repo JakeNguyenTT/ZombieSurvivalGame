@@ -34,10 +34,24 @@ public class UIManager : MonoBehaviour
         m_GameOverPanel.gameObject.SetActive(false);
     }
 
+    // Container for UI built from code; sits under the panels so they stay on top
+    public RectTransform RuntimeHUD { get; private set; }
+    public TMP_FontAsset HudFont => m_LevelText.font;
+
     public void Initialize()
     {
         ExperienceManager.Instance.OnLevelUp += ShowUpgradeOptions;
         GameManager.Instance.OnGameOver += ShowGameOver;
+        CreateRuntimeHUD();
+    }
+
+    private void CreateRuntimeHUD()
+    {
+        Transform panelParent = m_FadeBackground.transform.parent;
+        RuntimeHUD = RuntimeUI.CreateRect(panelParent, "RuntimeHUD");
+        RuntimeUI.Stretch(RuntimeHUD);
+        RuntimeHUD.SetSiblingIndex(m_FadeBackground.transform.GetSiblingIndex());
+        RuntimeHUD.gameObject.AddComponent<BossIndicator>().Init(RuntimeHUD, HudFont);
     }
 
     public void UpdateHealth(float health, float maxHealth) => m_HealthBar.SetValue(health, maxHealth);
@@ -66,12 +80,7 @@ public class UIManager : MonoBehaviour
         m_GameOverTimeText.text = $" {FormatTime(time)}";
     }
 
-    private string FormatTime(float time)
-    {
-        int minutes = Mathf.FloorToInt(time / 60);
-        int seconds = Mathf.FloorToInt(time % 60);
-        return $"{minutes:00}:{seconds:00}";
-    }
+    private string FormatTime(float time) => RuntimeUI.FormatTime(time);
 
     public void OnButtonPause()
     {

@@ -44,12 +44,12 @@ public class EnemyBehavior : MonoBehaviour
         SetColor(data.tint);
     }
 
-    public void InitializeBoss(Vector3 position, EnemyData data, EnemyEnhancement enhancement, int bossLevel = 1)
+    public void InitializeBoss(Vector3 position, EnemyData data, int bossLevel, float healthMultiplier)
     {
-        Initialize(position, data, enhancement);
+        Initialize(position, data, new EnemyEnhancement());
         m_Speed = Mathf.Max(0.5f, data.speed - 1);
-        m_Health = data.health * 10 * bossLevel;
-        m_Damage = data.damage * 5 * bossLevel;
+        m_Health = data.health * 10 * bossLevel * healthMultiplier;
+        m_Damage = data.damage * (2 + bossLevel);
         transform.localScale = Vector3.one * 5;
         m_IsBoss = true;
     }

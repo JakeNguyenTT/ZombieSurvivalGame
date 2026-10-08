@@ -1,6 +1,8 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using Random = UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -18,9 +20,12 @@ public class EnemySpawner : MonoBehaviour
     [Header("Read Only")]
     [SerializeField] private int m_CurrentActiveEnemies = 0;
 
-    private float m_SpawnRate = 1f;
     private float m_SpawnTimer;
-    private bool m_IsBossSpawned = false;
+    private int m_BossLevel; // number of bosses spawned so far
+
+    public EnemyBehavior ActiveBoss { get; private set; }
+    public int BossesKilled { get; private set; }
+    public event Action<EnemyBehavior> OnBossSpawned;
 
     void Awake()
     {
@@ -87,12 +92,17 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
+            float time = GameManager.Instance.GameTime;
+            if (Difficulty.BossLevelAt(time) > m_BossLevel)
+                SpawnBoss(m_BossLevel + 1);
+
             m_SpawnTimer -= Time.deltaTime;
             if (m_SpawnTimer <= 0)
             {
-                SpawnEnemy();
-                m_SpawnRate = Mathf.Max(0.1f, m_SpawnRate * 0.99f); // Increase difficulty
-                m_SpawnTimer = m_SpawnRate;
+                int batch = Difficulty.SpawnBatch(time);
+                for (int i = 0; i < batch; i++)
+                    SpawnEnemy();
+                m_SpawnTimer = Difficulty.SpawnInterval(time);
             }
             yield return null;
         }
@@ -119,26 +129,37 @@ public class EnemySpawner : MonoBehaviour
     {
         var enemyType = PickEnemyType();
         EnemyBehavior enemy = TakeFromPool(enemyType.prefab);
-        Vector3 spawnPos = RandomSpawnPosition();
-        // if time more than 30 seconds, increase enemy health, scale with time
-        var enemyEnhancement = new EnemyEnhancement();
-        var enemyKilled = GameManager.Instance.EnemyKilled;
-        if (enemyKilled > 30)
+        enemy.Initialize(RandomSpawnPosition(), enemyType, CurrentEnhancement(enemyType));
+        Track(enemy);
+    }
+
+    // Spawns the next boss immediately (debug / skip)
+    public void SpawnBossNow() => SpawnBoss(m_BossLevel + 1);
+
+    private void SpawnBoss(int level)
+    {
+        m_BossLevel = level;
+        var bossType = m_EnemyTypes[0];
+        EnemyBehavior boss = TakeFromPool(bossType.prefab);
+        boss.InitializeBoss(RandomSpawnPosition(), bossType, level, Difficulty.HealthMultiplier(GameManager.Instance.GameTime));
+        Track(boss);
+        ActiveBoss = boss;
+        OnBossSpawned?.Invoke(boss);
+    }
+
+    // Stats on top of the base type, growing with run time
+    private EnemyEnhancement CurrentEnhancement(EnemyData enemyType)
+    {
+        float time = GameManager.Instance.GameTime;
+        return new EnemyEnhancement
         {
-            // Bonus on top of base stats (EnemyBehavior.Initialize adds base + enhancement)
-            enemyEnhancement.health = enemyKilled - 30;
-            enemyEnhancement.damage = (enemyKilled - 30) * 0.1f;
-        }
-        // if time more than 60 seconds, spawn enemy boss, bigger, more health, slower speed, more damage
-        if (enemyKilled > 20 && !m_IsBossSpawned)
-        {
-            enemy.InitializeBoss(spawnPos, m_EnemyTypes[0], enemyEnhancement, 1);
-            m_IsBossSpawned = true;
-        }
-        else
-        {
-            enemy.Initialize(spawnPos, enemyType, enemyEnhancement);
-        }
+            health = enemyType.health * (Difficulty.HealthMultiplier(time) - 1f),
+            damage = enemyType.damage * (Difficulty.DamageMultiplier(time) - 1f),
+        };
+    }
+
+    private void Track(EnemyBehavior enemy)
+    {
         enemy.gameObject.SetActive(true);
         m_ActiveEnemies.Add(enemy);
         m_CurrentActiveEnemies = m_ActiveEnemies.Count;
@@ -146,6 +167,8 @@ public class EnemySpawner : MonoBehaviour
 
     public void ReturnEnemy(EnemyBehavior enemy)
     {
+        if (enemy.IsBoss) BossesKilled++;
+        if (enemy == ActiveBoss) ActiveBoss = null;
         enemy.gameObject.SetActive(false);
         GetPool(enemy.SourcePrefab).Enqueue(enemy);
         m_ActiveEnemies.Remove(enemy);
