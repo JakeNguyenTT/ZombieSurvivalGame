@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class EnemyBehavior : MonoBehaviour
 {
+    private const float ExploderTriggerDistance = 1.5f;
+    private const float FuseBlinkInterval = 0.1f;
+    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+
     [SerializeField] private float m_Speed = 2f;
     [SerializeField] private float m_Health = 100f;
     [SerializeField] private float m_Damage = 10f;
@@ -9,8 +13,21 @@ public class EnemyBehavior : MonoBehaviour
     bool m_IsBoss = false;
     EnemyData m_Data;
 
-    // private float m_UpdateInterval = 0.1f;
-    // private float m_UpdateTimer;
+    private Renderer[] m_Renderers;
+    private MaterialPropertyBlock m_PropertyBlock;
+    private float m_AttackTimer;
+    private float m_FuseTimer = -1f;
+
+    public EnemyBehavior SourcePrefab { get; set; }
+    public EnemyData Data => m_Data;
+    public bool IsBoss => m_IsBoss;
+    public bool IsAlive => m_Health > 0;
+
+    void Awake()
+    {
+        m_Renderers = GetComponentsInChildren<Renderer>(true);
+        m_PropertyBlock = new MaterialPropertyBlock();
+    }
 
     public void Initialize(Vector3 position, EnemyData data, EnemyEnhancement enhancement)
     {
@@ -18,16 +35,17 @@ public class EnemyBehavior : MonoBehaviour
         m_Speed = data.speed + enhancement.speed;
         m_Health = data.health + enhancement.health;
         m_Damage = data.damage + enhancement.damage;
-        // m_UpdateTimer = Random.Range(0f, m_UpdateInterval);
         gameObject.SetActive(true);
-        transform.localScale = Vector3.one;
+        transform.localScale = Vector3.one * data.scale;
         m_Data = data;
         m_IsBoss = false;
+        m_AttackTimer = data.attackCooldown;
+        m_FuseTimer = -1f;
+        SetColor(data.tint);
     }
 
     public void InitializeBoss(Vector3 position, EnemyData data, EnemyEnhancement enhancement, int bossLevel = 1)
     {
-        // boss is 10 times bigger
         Initialize(position, data, enhancement);
         m_Speed = Mathf.Max(0.5f, data.speed - 1);
         m_Health = data.health * 10 * bossLevel;
@@ -38,27 +56,76 @@ public class EnemyBehavior : MonoBehaviour
 
     void Update()
     {
-        // m_UpdateTimer -= Time.deltaTime;
-        // if (m_UpdateTimer <= 0)
+        Vector3 toPlayer = GameManager.Instance.GetPlayerPosition() - transform.position;
+        toPlayer.y = 0; // Keep movement in XZ plane
+        float distance = toPlayer.magnitude;
+        if (distance < 0.01f) return;
+        Vector3 direction = toPlayer / distance;
+        transform.rotation = Quaternion.LookRotation(direction);
+
+        switch (m_IsBoss ? EnemyArchetype.Walker : m_Data.archetype)
         {
-            MoveTowardsPlayer();
-            // m_UpdateTimer = m_UpdateInterval;
+            case EnemyArchetype.Spitter:
+                UpdateSpitter(direction, distance);
+                break;
+            case EnemyArchetype.Exploder:
+                UpdateExploder(direction, distance);
+                break;
+            default:
+                Move(direction);
+                break;
         }
     }
 
-    private void MoveTowardsPlayer()
+    private void Move(Vector3 direction)
     {
-        Vector3 direction = (GameManager.Instance.GetPlayerPosition() - transform.position);
-        direction.y = 0; // Keep movement in XZ plane
-        if (direction.sqrMagnitude < 0.0001f) return;
-        direction.Normalize();
-        // transform.position += direction * m_Speed * m_UpdateInterval;
         transform.position += direction * m_Speed * Time.deltaTime;
-        transform.rotation = Quaternion.LookRotation(direction);
+    }
+
+    private void UpdateSpitter(Vector3 direction, float distance)
+    {
+        if (distance > m_Data.attackRange)
+            Move(direction);
+
+        m_AttackTimer -= Time.deltaTime;
+        if (m_AttackTimer <= 0 && distance <= m_Data.attackRange * 1.2f)
+        {
+            Vector3 muzzle = transform.position + Vector3.up * 1.2f + direction * 0.5f;
+            EnemyProjectile.Fire(muzzle, direction, m_Data.projectileSpeed, m_Damage, m_Data.tint);
+            m_AttackTimer = m_Data.attackCooldown;
+        }
+    }
+
+    private void UpdateExploder(Vector3 direction, float distance)
+    {
+        if (m_FuseTimer < 0)
+        {
+            Move(direction);
+            if (distance < ExploderTriggerDistance)
+                m_FuseTimer = m_Data.fuseTime;
+            return;
+        }
+
+        m_FuseTimer -= Time.deltaTime;
+        bool blinkOn = Mathf.FloorToInt(m_FuseTimer / FuseBlinkInterval) % 2 == 0;
+        SetColor(blinkOn ? Color.white : m_Data.tint);
+        if (m_FuseTimer <= 0)
+            Explode();
+    }
+
+    private void Explode()
+    {
+        Vector3 toPlayer = GameManager.Instance.GetPlayerPosition() - transform.position;
+        toPlayer.y = 0;
+        if (toPlayer.magnitude <= m_Data.explodeRadius)
+            PlayerManager.Instance.TakeDamage(m_Damage);
+        Die();
     }
 
     void OnTriggerStay(Collider other)
     {
+        // Exploders only hurt by exploding
+        if (!m_IsBoss && m_Data != null && m_Data.archetype == EnemyArchetype.Exploder) return;
         if (other.CompareTag("Player"))
         {
             other.GetComponent<PlayerManager>().TakeDamage(m_Damage);
@@ -79,14 +146,25 @@ public class EnemyBehavior : MonoBehaviour
 
     private void Die()
     {
+        m_Health = 0;
         AudioManager.Instance.PlaySFX(m_Data.deathSound, transform.position);
         ExpSpawner.Instance.SpawnExp(transform.position);
         if (m_IsBoss)
-        {
             ExpSpawner.Instance.SpawnExpAround(transform.position, 10, 5);
-        }
+        else if (m_Data.expDrops > 1)
+            ExpSpawner.Instance.SpawnExpAround(transform.position, m_Data.expDrops - 1, 1.5f);
         EffectPool.Play(m_DeathEffect, transform.position);
         gameObject.SetActive(false);
         EnemySpawner.Instance.ReturnEnemy(this);
+    }
+
+    private void SetColor(Color color)
+    {
+        foreach (var r in m_Renderers)
+        {
+            r.GetPropertyBlock(m_PropertyBlock);
+            m_PropertyBlock.SetColor(BaseColorId, color);
+            r.SetPropertyBlock(m_PropertyBlock);
+        }
     }
 }

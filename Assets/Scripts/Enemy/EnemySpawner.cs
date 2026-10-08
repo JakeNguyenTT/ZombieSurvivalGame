@@ -6,12 +6,15 @@ public class EnemySpawner : MonoBehaviour
 {
     public static EnemySpawner Instance { get; private set; }
     [SerializeField] private List<EnemyData> m_EnemyTypes;
-    private Queue<EnemyBehavior> m_EnemyPool = new Queue<EnemyBehavior>();
+    // One pool per prefab so an instance is always reused with a matching model
+    private readonly Dictionary<EnemyBehavior, Queue<EnemyBehavior>> m_Pools = new Dictionary<EnemyBehavior, Queue<EnemyBehavior>>();
     private readonly List<EnemyBehavior> m_ActiveEnemies = new List<EnemyBehavior>();
+    private readonly List<float> m_SpawnWeights = new List<float>();
 
     [SerializeField] private float m_SpawnRange = 25f;
 
     [SerializeField] private int m_InitialPoolSize = 10000;
+    [SerializeField] private int m_PoolGrowSize = 10;
     [Header("Read Only")]
     [SerializeField] private int m_CurrentActiveEnemies = 0;
 
@@ -24,16 +27,9 @@ public class EnemySpawner : MonoBehaviour
         Instance = this;
     }
 
-    // Call this to populate the pool initially (e.g., from GameManager)
-    public void InitializePool(EnemyBehavior[] enemies)
-    {
-        foreach (var enemy in enemies)
-            m_EnemyPool.Enqueue(enemy);
-    }
-
     public void Initialize()
     {
-        PreloadEnemies();
+        PreloadEnemies(m_InitialPoolSize);
     }
 
     public void StartSpawning()
@@ -46,17 +42,45 @@ public class EnemySpawner : MonoBehaviour
         StopAllCoroutines();
     }
 
-    private void PreloadEnemies()
+    private void PreloadEnemies(int total)
     {
+        var prefabs = new List<EnemyBehavior>();
         foreach (var enemyType in m_EnemyTypes)
+            if (enemyType.prefab != null && !prefabs.Contains(enemyType.prefab))
+                prefabs.Add(enemyType.prefab);
+        if (prefabs.Count == 0) return;
+
+        int perPrefab = Mathf.Max(1, total / prefabs.Count);
+        foreach (var prefab in prefabs)
+            for (int i = 0; i < perPrefab; i++)
+                CreateEnemy(prefab);
+    }
+
+    private void CreateEnemy(EnemyBehavior prefab)
+    {
+        EnemyBehavior enemy = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        enemy.SourcePrefab = prefab;
+        enemy.gameObject.SetActive(false);
+        GetPool(prefab).Enqueue(enemy);
+    }
+
+    private Queue<EnemyBehavior> GetPool(EnemyBehavior prefab)
+    {
+        if (!m_Pools.TryGetValue(prefab, out var pool))
         {
-            for (int i = 0; i < m_InitialPoolSize / m_EnemyTypes.Count; i++)
-            {
-                EnemyBehavior enemy = Instantiate(enemyType.prefab, Vector3.zero, Quaternion.identity);
-                enemy.gameObject.SetActive(false);
-                m_EnemyPool.Enqueue(enemy);
-            }
+            pool = new Queue<EnemyBehavior>();
+            m_Pools.Add(prefab, pool);
         }
+        return pool;
+    }
+
+    private EnemyBehavior TakeFromPool(EnemyBehavior prefab)
+    {
+        var pool = GetPool(prefab);
+        if (pool.Count == 0)
+            for (int i = 0; i < m_PoolGrowSize; i++)
+                CreateEnemy(prefab);
+        return pool.Dequeue();
     }
 
     private IEnumerator SpawnRoutine()
@@ -74,15 +98,28 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    // Weighted pick among the types unlocked at the current run time
+    private EnemyData PickEnemyType()
+    {
+        float time = GameManager.Instance.GameTime;
+        m_SpawnWeights.Clear();
+        foreach (var enemyType in m_EnemyTypes)
+            m_SpawnWeights.Add(time >= enemyType.unlockTime ? enemyType.spawnWeight : 0f);
+        int index = WeightedRandom.Pick(m_SpawnWeights, Random.value);
+        return index >= 0 ? m_EnemyTypes[index] : m_EnemyTypes[0];
+    }
+
+    private Vector3 RandomSpawnPosition()
+    {
+        Vector2 circle = Random.insideUnitCircle.normalized * m_SpawnRange;
+        return new Vector3(circle.x, 0, circle.y) + GameManager.Instance.GetPlayerPosition();
+    }
+
     public void SpawnEnemy()
     {
-        if (m_EnemyPool.Count == 0)
-            PreloadEnemies();
-
-        EnemyBehavior enemy = m_EnemyPool.Dequeue();
-        Vector2 circle = Random.insideUnitCircle.normalized * m_SpawnRange;
-        Vector3 spawnPos = new Vector3(circle.x, 0, circle.y) + GameManager.Instance.GetPlayerPosition();
-        var enemyType = m_EnemyTypes[Random.Range(0, m_EnemyTypes.Count)];
+        var enemyType = PickEnemyType();
+        EnemyBehavior enemy = TakeFromPool(enemyType.prefab);
+        Vector3 spawnPos = RandomSpawnPosition();
         // if time more than 30 seconds, increase enemy health, scale with time
         var enemyEnhancement = new EnemyEnhancement();
         var enemyKilled = GameManager.Instance.EnemyKilled;
@@ -95,7 +132,7 @@ public class EnemySpawner : MonoBehaviour
         // if time more than 60 seconds, spawn enemy boss, bigger, more health, slower speed, more damage
         if (enemyKilled > 20 && !m_IsBossSpawned)
         {
-            enemy.InitializeBoss(spawnPos, enemyType, enemyEnhancement, 1);
+            enemy.InitializeBoss(spawnPos, m_EnemyTypes[0], enemyEnhancement, 1);
             m_IsBossSpawned = true;
         }
         else
@@ -110,7 +147,7 @@ public class EnemySpawner : MonoBehaviour
     public void ReturnEnemy(EnemyBehavior enemy)
     {
         enemy.gameObject.SetActive(false);
-        m_EnemyPool.Enqueue(enemy);
+        GetPool(enemy.SourcePrefab).Enqueue(enemy);
         m_ActiveEnemies.Remove(enemy);
         m_CurrentActiveEnemies = m_ActiveEnemies.Count;
         GameManager.Instance.KillEnemy();
@@ -140,4 +177,3 @@ public class EnemyEnhancement
     public float speed;
     public float damage;
 }
-

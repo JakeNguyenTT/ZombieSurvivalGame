@@ -1360,6 +1360,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_EnemyTypes:
   - {fileID: 11400000, guid: 9de6494867f92f840a7ee70da1d56696, type: 2}
+  - {fileID: 11400000, guid: 5932d30e23424a2b9cfed0ad975d54fe, type: 2}
+  - {fileID: 11400000, guid: 6b41d70c3fe04e0785a4f2d293c604f4, type: 2}
+  - {fileID: 11400000, guid: 41417a91c62c41d3878a3e909c12cb62, type: 2}
+  - {fileID: 11400000, guid: 2d6e33916f8640109174571eb449d448, type: 2}
   m_SpawnRange: 25
   m_InitialPoolSize: 100
   m_CurrentActiveEnemies: 0
