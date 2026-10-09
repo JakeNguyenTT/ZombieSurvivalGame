@@ -9,11 +9,14 @@ public static class ArenaProps
     private const string ObstacleTag = "Obstacle";
     private const int AttemptsPerProp = 20;
 
-    private static readonly List<Vector3> s_SolidPositions = new List<Vector3>();
+    private static readonly List<ArenaObstacle> s_Obstacles = new List<ArenaObstacle>();
+
+    // Solid props placed this run, as flat circles (used for enemy pathing and spawn checks)
+    public static IReadOnlyList<ArenaObstacle> Obstacles => s_Obstacles;
 
     public static void Spawn(Vector3 playerStart)
     {
-        s_SolidPositions.Clear();
+        s_Obstacles.Clear();
         var set = Resources.Load<ArenaPropSet>(ResourcePath);
         GameObject ground = GameObject.Find(GroundName);
         if (set == null || ground == null || !TryGetBounds(ground, out Bounds bounds)) return;
@@ -23,14 +26,14 @@ public static class ArenaProps
         Place(set, set.decorProps, set.decorCount, false, bounds, playerStart, root);
     }
 
-    // True when a spot is clear of solid props (used to keep enemy spawns out of rocks)
+    // True when a circle of `radius` at `position` doesn't overlap any solid prop
     public static bool IsClear(Vector3 position, float radius)
     {
-        foreach (Vector3 solid in s_SolidPositions)
+        var point = new Vector2(position.x, position.z);
+        foreach (ArenaObstacle obstacle in s_Obstacles)
         {
-            Vector3 offset = solid - position;
-            offset.y = 0;
-            if (offset.sqrMagnitude < radius * radius) return false;
+            float reach = radius + obstacle.Radius;
+            if ((obstacle.Position - point).sqrMagnitude < reach * reach) return false;
         }
         return true;
     }
@@ -60,10 +63,37 @@ public static class ArenaProps
                     if (solid) collider.gameObject.tag = ObstacleTag;
                     else collider.enabled = false;
                 }
-                if (solid) s_SolidPositions.Add(position);
+                if (solid)
+                    s_Obstacles.Add(new ArenaObstacle(new Vector2(position.x, position.z), FootprintRadius(prop)));
                 break;
             }
         }
+    }
+
+    // Half the larger horizontal size of what actually blocks: colliders (a tree's trunk, not
+    // its canopy), falling back to renderers
+    private static float FootprintRadius(GameObject prop)
+    {
+        Physics.SyncTransforms(); // collider bounds of a just-instantiated prop
+        if (TryEncapsulate(prop.GetComponentsInChildren<Collider>(), c => c.bounds, out Bounds bounds) ||
+            TryEncapsulate(prop.GetComponentsInChildren<Renderer>(), r => r.bounds, out bounds))
+            return Mathf.Max(bounds.extents.x, bounds.extents.z);
+        return 0.5f;
+    }
+
+    private static bool TryEncapsulate<T>(T[] parts, System.Func<T, Bounds> getBounds, out Bounds bounds)
+    {
+        bounds = default;
+        bool any = false;
+        foreach (T part in parts)
+        {
+            Bounds partBounds = getBounds(part);
+            if (partBounds.size == Vector3.zero) continue;
+            if (any) bounds.Encapsulate(partBounds);
+            else bounds = partBounds;
+            any = true;
+        }
+        return any;
     }
 
     private static bool TryGetBounds(GameObject ground, out Bounds bounds)
@@ -72,5 +102,17 @@ public static class ArenaProps
         if (ground.TryGetComponent(out Renderer renderer)) { bounds = renderer.bounds; return true; }
         bounds = default;
         return false;
+    }
+}
+
+public readonly struct ArenaObstacle
+{
+    public readonly Vector2 Position; // world XZ
+    public readonly float Radius;
+
+    public ArenaObstacle(Vector2 position, float radius)
+    {
+        Position = position;
+        Radius = radius;
     }
 }

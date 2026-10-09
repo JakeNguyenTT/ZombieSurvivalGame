@@ -69,6 +69,8 @@ public class SmokeTests
         Component game = FindByTypeName("GameManager");
         Assert.IsNotNull(game, "GameManager missing");
 
+        Assert.IsNotNull(FindByTypeName("EnemyNavigation"), "Enemy navigation was not created");
+
         GameObject props = GameObject.Find("ArenaProps");
         Assert.IsNotNull(props, "Arena props were not spawned");
         Assert.That(props.transform.childCount, Is.GreaterThan(20), "Too few arena props placed");

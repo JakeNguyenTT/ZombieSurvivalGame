@@ -7,6 +7,7 @@ public class EnemyBehavior : MonoBehaviour
     private const float FlashDuration = 0.08f;
     private const float KnockbackSpeed = 4f;
     private const float KnockbackDamping = 10f;
+    private const float TurnRate = 6f; // radians per second
     private static readonly Color FlashColor = new Color(1f, 0.3f, 0.3f, 1f);
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
@@ -23,6 +24,7 @@ public class EnemyBehavior : MonoBehaviour
     private float m_FuseTimer = -1f;
     private float m_FlashTimer;
     private Vector3 m_Knockback;
+    private Vector3 m_Heading;
 
     public EnemyBehavior SourcePrefab { get; set; }
     public EnemyData Data => m_Data;
@@ -53,6 +55,7 @@ public class EnemyBehavior : MonoBehaviour
         m_FuseTimer = -1f;
         m_FlashTimer = 0f;
         m_Knockback = Vector3.zero;
+        m_Heading = Vector3.zero;
         SetColor(data.tint);
     }
 
@@ -76,7 +79,8 @@ public class EnemyBehavior : MonoBehaviour
         float distance = toPlayer.magnitude;
         if (distance < 0.01f) return;
         Vector3 direction = toPlayer / distance;
-        transform.rotation = Quaternion.LookRotation(direction);
+        UpdateHeading(direction);
+        transform.rotation = Quaternion.LookRotation(m_Heading);
 
         switch (m_IsBoss ? EnemyArchetype.Walker : m_Data.archetype)
         {
@@ -84,12 +88,21 @@ public class EnemyBehavior : MonoBehaviour
                 UpdateSpitter(direction, distance);
                 break;
             case EnemyArchetype.Exploder:
-                UpdateExploder(direction, distance);
+                UpdateExploder(distance);
                 break;
             default:
-                Move(direction);
+                Move();
                 break;
         }
+    }
+
+    // Walk direction: around obstacles via the shared flow field, turning smoothly
+    private void UpdateHeading(Vector3 direct)
+    {
+        Vector3 desired = EnemyNavigation.Instance != null ? EnemyNavigation.Instance.Steer(transform.position, direct) : direct;
+        m_Heading = m_Heading == Vector3.zero
+            ? desired
+            : Vector3.RotateTowards(m_Heading, desired, TurnRate * Time.deltaTime, 0f);
     }
 
     private void UpdateHitFeedback()
@@ -107,15 +120,16 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    private void Move(Vector3 direction)
+    private void Move()
     {
-        transform.position += direction * m_Speed * Time.deltaTime;
+        transform.position += m_Heading * m_Speed * Time.deltaTime;
     }
 
+    // `direction` is the straight line to the player: spitters walk around rocks but aim straight
     private void UpdateSpitter(Vector3 direction, float distance)
     {
         if (distance > m_Data.attackRange)
-            Move(direction);
+            Move();
 
         m_AttackTimer -= Time.deltaTime;
         if (m_AttackTimer <= 0 && distance <= m_Data.attackRange * 1.2f)
@@ -127,11 +141,11 @@ public class EnemyBehavior : MonoBehaviour
         }
     }
 
-    private void UpdateExploder(Vector3 direction, float distance)
+    private void UpdateExploder(float distance)
     {
         if (m_FuseTimer < 0)
         {
-            Move(direction);
+            Move();
             if (distance < ExploderTriggerDistance)
                 m_FuseTimer = m_Data.fuseTime;
             return;

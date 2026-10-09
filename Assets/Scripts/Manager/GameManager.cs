@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         ArenaProps.Spawn(GetPlayerPosition());
+        gameObject.AddComponent<EnemyNavigation>();
         m_EnemySpawner.Initialize();
         m_UIManager.Initialize();
         // m_AudioManager.PlayMusic("BackgroundMusic");
