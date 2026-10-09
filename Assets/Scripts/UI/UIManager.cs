@@ -44,6 +44,9 @@ public class UIManager : MonoBehaviour
         ExperienceManager.Instance.OnLevelUp += ShowUpgradeOptions;
         GameManager.Instance.OnGameOver += ShowGameOver;
         CreateRuntimeHUD();
+        // Replace the scene's placeholder text ("Time: 12:30", "Killed : 2000") right away
+        UpdateTime(0f);
+        UpdateEnemyKilled(0);
     }
 
     private void CreateRuntimeHUD()
@@ -89,26 +92,39 @@ public class UIManager : MonoBehaviour
         m_GameOverPanel.gameObject.SetActive(true);
         m_GameOverTimeText.text = $" {FormatTime(result.Time)}";
 
+        // The panel's Level row was never filled in (it always showed its placeholder)
+        Transform levelValue = m_GameOverPanel.transform.Find("Level/GameOverTimeText");
+        if (levelValue != null && levelValue.TryGetComponent(out TMP_Text levelText))
+            levelText.text = $" {result.Level}";
+
         if (m_RunStatsText == null) CreateRunStatsText();
-        string best = result.NewBestTime ? "\nNew best time!" : result.NewBestKills ? "\nNew best kills!" : "";
+        string best = result.NewBestTime ? "   New best time!" : result.NewBestKills ? "   New best kills!" : "";
         m_RunStatsText.text =
-            $"Kills {result.Kills}   Level {result.Level}   Bosses {result.Bosses}\n" +
+            $"Kills {result.Kills}   Bosses {result.Bosses}\n" +
             $"+{result.Coins} coins (total {SaveData.Coins}){best}";
     }
 
-    // Copy of the time text (same font and style) centered between the time row and the buttons
+    // Copy of the time text (same font and style) in a band added between the Level row and the
+    // buttons. The panel is 800x400 with rows at +107 / +12 and buttons along the bottom, so it is
+    // made taller; centered rows stay put and the bottom-anchored buttons move down.
     private void CreateRunStatsText()
     {
+        const float ExtraHeight = 140f;
+        var panel = (RectTransform)m_GameOverPanel.transform;
+        panel.sizeDelta += new Vector2(0, ExtraHeight); // grows equally up and down; stays centered
+
         m_RunStatsText = Instantiate(m_GameOverTimeText, m_GameOverPanel.transform);
         m_RunStatsText.name = "RunStatsText";
         var layoutElement = m_RunStatsText.GetComponent<LayoutElement>();
         if (layoutElement == null) layoutElement = m_RunStatsText.gameObject.AddComponent<LayoutElement>();
         layoutElement.ignoreLayout = true;
-        m_RunStatsText.enableAutoSizing = false;
-        m_RunStatsText.fontSize = 34;
+        m_RunStatsText.enableAutoSizing = true; // two lines that must fit the band
+        m_RunStatsText.fontSizeMin = 26;
+        m_RunStatsText.fontSizeMax = 44;
         m_RunStatsText.alignment = TextAlignmentOptions.Center;
         m_RunStatsText.overflowMode = TextOverflowModes.Overflow;
-        RuntimeUI.Place(m_RunStatsText.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0, 10), new Vector2(760, 140));
+        // Level row bottom edge is at -28; buttons now start at -270 + 120 = -150
+        RuntimeUI.Place(m_RunStatsText.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0, -89), new Vector2(760, 110));
     }
 
     private string FormatTime(float time) => RuntimeUI.FormatTime(time);

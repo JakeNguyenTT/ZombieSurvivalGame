@@ -88,7 +88,7 @@ public class UpgradeManager : MonoBehaviour
             case UpgradeType.Evolve when upgrade.weaponData != null:
                 return ($"Evolve: {upgrade.weaponData.weaponName}", upgrade.description);
             default:
-                return (upgrade.name, upgrade.description);
+                return (TextUtil.Nicify(upgrade.name), upgrade.description);
         }
     }
 

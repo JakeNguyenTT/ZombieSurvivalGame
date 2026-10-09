@@ -118,6 +118,20 @@ public class MetaUpgradesTests
     }
 }
 
+public class TextUtilTests
+{
+    [TestCase("ProjectileSpeed", "Projectile Speed")]
+    [TestCase("MaxHP", "Max HP")]
+    [TestCase("FireRate", "Fire Rate")]
+    [TestCase("Heal", "Heal")]
+    [TestCase("HPRegen", "HP Regen")]
+    [TestCase("", "")]
+    public void Nicify_SplitsWords(string input, string expected)
+    {
+        Assert.AreEqual(expected, TextUtil.Nicify(input));
+    }
+}
+
 public class RunRewardsTests
 {
     [Test]

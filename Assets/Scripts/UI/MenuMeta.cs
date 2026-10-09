@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class MenuMeta : MonoBehaviour
 {
     private static readonly Color OverlayColor = new Color(0f, 0f, 0f, 0.7f);
-    private static readonly Color BoxColor = new Color(0.08f, 0.08f, 0.1f, 0.95f);
+    private static readonly Color BoxColor = new Color(0.08f, 0.08f, 0.1f, 1f);
     private const float RowLabelWidth = 560f;
     private const float RowButtonWidth = 300f;
     private const float RowHeight = 80f;
@@ -102,7 +102,7 @@ public class MenuMeta : MonoBehaviour
         {
             MetaStat stat = value;
             RectTransform row = AddRow(content);
-            TextMeshProUGUI label = AddText(row, "", 34, TextAlignmentOptions.MidlineLeft);
+            TextMeshProUGUI label = AddText(row, "", 38, TextAlignmentOptions.MidlineLeft);
             RuntimeUI.SetPreferredSize(label, RowLabelWidth, RowHeight);
             Button buy = RuntimeUI.CloneButton(m_Template, row, "", () =>
             {
