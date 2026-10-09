@@ -78,6 +78,8 @@ public class BalanceSimulation
             Component player = FindByTypeName("PlayerManager");
             Component game = FindByTypeName("GameManager");
             player.gameObject.AddComponent(botType);
+            yield return null; // let the bot read the camera before rendering is switched off
+            StopRendering();
             Time.captureDeltaTime = Step;
 
             var record = new RunRecord { seed = seed };
@@ -109,6 +111,17 @@ public class BalanceSimulation
             Debug.Log("[Balance] " + line);
             Time.captureDeltaTime = 0f;
         }
+    }
+
+    // Nobody watches the simulation: skip drawing the world and the UI (about 2-3x faster).
+    // Only rendering is turned off; camera transforms keep updating, so game logic is unchanged.
+    // The next scene load brings everything back.
+    private static void StopRendering()
+    {
+        foreach (Camera camera in UnityEngine.Object.FindObjectsByType<Camera>())
+            camera.enabled = false;
+        foreach (Canvas canvas in UnityEngine.Object.FindObjectsByType<Canvas>())
+            canvas.enabled = false;
     }
 
     private static string DescribeWeapons(Component weaponSystem)

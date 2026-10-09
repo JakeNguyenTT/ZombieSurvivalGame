@@ -62,9 +62,9 @@ public class EnemyBehavior : MonoBehaviour
     public void InitializeBoss(Vector3 position, EnemyData data, int bossLevel, float healthMultiplier)
     {
         Initialize(position, data, new EnemyEnhancement());
-        m_Speed = Mathf.Max(0.5f, data.speed - 1);
-        m_Health = m_MaxHealth = data.health * 10 * bossLevel * healthMultiplier;
-        m_Damage = data.damage * (2 + bossLevel);
+        m_Speed = data.speed * 0.9f; // slower than the horde, but fast enough to close in and become the target
+        m_Health = m_MaxHealth = Difficulty.BossHealth(data.health, bossLevel, healthMultiplier);
+        m_Damage = Difficulty.BossDamage(data.damage, bossLevel);
         transform.localScale = Vector3.one * 5;
         m_IsBoss = true;
         BossLevel = bossLevel;

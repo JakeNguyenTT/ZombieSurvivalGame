@@ -26,6 +26,7 @@ public class EnemySpawner : MonoBehaviour
     public IReadOnlyList<EnemyBehavior> ActiveEnemies => m_ActiveEnemies;
     public EnemyBehavior ActiveBoss { get; private set; }
     public int BossesKilled { get; private set; }
+    public int BossesSpawned => m_BossLevel;
     public event Action<EnemyBehavior> OnBossSpawned;
 
     void Awake()

@@ -7,6 +7,7 @@ public class ExpSpawner : MonoBehaviour
     public static ExpSpawner Instance;
     [SerializeField] private ExperienceGem m_ExpGemPrefab;
     private readonly Queue<ExperienceGem> m_Pool = new Queue<ExperienceGem>();
+    public int GemsSpawned { get; private set; }
 
     void Awake()
     {
@@ -36,6 +37,7 @@ public class ExpSpawner : MonoBehaviour
 
     private void GetGem(Vector3 position)
     {
+        GemsSpawned++;
         if (m_Pool.Count == 0)
         {
             Instantiate(m_ExpGemPrefab, position, Quaternion.identity);

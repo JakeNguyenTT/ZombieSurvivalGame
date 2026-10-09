@@ -4,44 +4,58 @@ using NUnit.Framework;
 public class DifficultyTests
 {
     [Test]
-    public void SpawnInterval_StartsAtOneSecond_AndShrinksOverTime()
+    public void SpawnInterval_StartsSlow_AndHalvesByMinuteFour()
     {
-        Assert.AreEqual(1f, Difficulty.SpawnInterval(0f), 1e-4f);
-        Assert.AreEqual(0.5f, Difficulty.SpawnInterval(60f), 1e-4f);
+        Assert.AreEqual(1.2f, Difficulty.SpawnInterval(0f), 1e-4f);
+        Assert.AreEqual(0.6f, Difficulty.SpawnInterval(240f), 1e-4f);
+    }
+
+    [Test]
+    public void BossDamage_GrowsByHalfBasePerLevel()
+    {
+        Assert.AreEqual(15f, Difficulty.BossDamage(10f, 1), 1e-4f);
+        Assert.AreEqual(25f, Difficulty.BossDamage(10f, 3), 1e-4f);
     }
 
     [Test]
     public void SpawnInterval_IsClampedToMinimum()
     {
-        Assert.AreEqual(0.15f, Difficulty.SpawnInterval(3600f), 1e-4f);
+        Assert.AreEqual(0.25f, Difficulty.SpawnInterval(3600f), 1e-4f);
     }
 
     [Test]
-    public void SpawnBatch_GrowsEveryTwoMinutes()
+    public void SpawnBatch_GrowsEveryFourMinutes()
     {
         Assert.AreEqual(1, Difficulty.SpawnBatch(0f));
-        Assert.AreEqual(1, Difficulty.SpawnBatch(119f));
-        Assert.AreEqual(2, Difficulty.SpawnBatch(120f));
-        Assert.AreEqual(3, Difficulty.SpawnBatch(250f));
+        Assert.AreEqual(1, Difficulty.SpawnBatch(239f));
+        Assert.AreEqual(2, Difficulty.SpawnBatch(240f));
+        Assert.AreEqual(3, Difficulty.SpawnBatch(500f));
     }
 
     [Test]
     public void Multipliers_StartAtOne_AndGrowLinearly()
     {
         Assert.AreEqual(1f, Difficulty.HealthMultiplier(0f), 1e-4f);
-        Assert.AreEqual(1.25f, Difficulty.HealthMultiplier(60f), 1e-4f);
+        Assert.AreEqual(1.1f, Difficulty.HealthMultiplier(60f), 1e-4f);
         Assert.AreEqual(1f, Difficulty.DamageMultiplier(0f), 1e-4f);
-        Assert.AreEqual(1.1f, Difficulty.DamageMultiplier(60f), 1e-4f);
+        Assert.AreEqual(1.03f, Difficulty.DamageMultiplier(60f), 1e-4f);
     }
 
     [Test]
     public void BossLevel_IsZeroBeforeFirstBoss_ThenCountsIntervals()
     {
         Assert.AreEqual(0, Difficulty.BossLevelAt(0f));
-        Assert.AreEqual(0, Difficulty.BossLevelAt(89.9f));
-        Assert.AreEqual(1, Difficulty.BossLevelAt(90f));
-        Assert.AreEqual(1, Difficulty.BossLevelAt(209.9f));
-        Assert.AreEqual(2, Difficulty.BossLevelAt(210f));
+        Assert.AreEqual(0, Difficulty.BossLevelAt(119.9f));
+        Assert.AreEqual(1, Difficulty.BossLevelAt(120f));
+        Assert.AreEqual(1, Difficulty.BossLevelAt(269.9f));
+        Assert.AreEqual(2, Difficulty.BossLevelAt(270f));
+    }
+
+    [Test]
+    public void BossHealth_ScalesWithLevelAndTime()
+    {
+        Assert.AreEqual(600f, Difficulty.BossHealth(100f, 1, 1f), 1e-3f);
+        Assert.AreEqual(1800f, Difficulty.BossHealth(100f, 2, 1.5f), 1e-3f);
     }
 }
 

@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     private float m_GameTime;
     private bool m_IsPlaying;
     public bool IsPlaying => m_IsPlaying;
+    public bool IsGameOver => m_IsGameOver;
     public float GameTime => m_GameTime;
     public int EnemyKilled
     {

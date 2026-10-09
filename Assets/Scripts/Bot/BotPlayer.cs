@@ -67,7 +67,7 @@ public class BotPlayer : MonoBehaviour
             float distance = away.magnitude - 0.5f * enemy.transform.localScale.x;
             if (distance > ThreatRadius) continue;
             distance = Mathf.Max(distance, 0.3f);
-            float weight = enemy.IsBoss ? 4f : 1f;
+            float weight = enemy.IsBoss ? 1.5f : 1f;
             threat += away.normalized * 4f * weight / (distance * distance);
         }
 

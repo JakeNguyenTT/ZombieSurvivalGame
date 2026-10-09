@@ -8,6 +8,7 @@ public class HomingMissile : MonoBehaviour
     private const float TurnRateDegrees = 360f;
     private const float Lifetime = 4f;
     private const float HitDistance = 0.8f;
+    private const float BossPriorityRange = 30f;
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
     private static readonly Queue<HomingMissile> s_Pool = new Queue<HomingMissile>();
@@ -57,7 +58,7 @@ public class HomingMissile : MonoBehaviour
     {
         if (Time.deltaTime <= 0f) return; // paused
         if (m_Target == null || !m_Target.IsAlive || !m_Target.gameObject.activeInHierarchy)
-            m_Target = EnemySpawner.Instance.GetClosestEnemy(transform.position);
+            m_Target = PickTarget(transform.position);
 
         if (m_Target != null)
         {
@@ -79,6 +80,15 @@ public class HomingMissile : MonoBehaviour
 
         m_Life -= Time.deltaTime;
         if (m_Life <= 0f) Explode();
+    }
+
+    // A nearby boss first: other weapons aim at the closest zombie, which is rarely the boss
+    private static EnemyBehavior PickTarget(Vector3 position)
+    {
+        EnemyBehavior boss = EnemySpawner.Instance.ActiveBoss;
+        if (boss != null && boss.IsAlive && (boss.transform.position - position).sqrMagnitude < BossPriorityRange * BossPriorityRange)
+            return boss;
+        return EnemySpawner.Instance.GetClosestEnemy(position);
     }
 
     private void Explode()

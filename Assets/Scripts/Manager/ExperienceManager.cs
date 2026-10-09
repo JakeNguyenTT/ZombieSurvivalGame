@@ -12,6 +12,7 @@ public class ExperienceManager : MonoBehaviour
 
     public event Action<UpgradeData[]> OnLevelUp;
     public int CurrentLevel => m_CurrentLevel;
+    public float TotalCollected { get; private set; } // all experience this run
 
     void Awake()
     {
@@ -29,6 +30,7 @@ public class ExperienceManager : MonoBehaviour
 
     public void AddExperience(float amount)
     {
+        TotalCollected += amount;
         m_CurrentExp += amount;
         if (m_CurrentExp >= m_ExpThreshold)
             LevelUp();
