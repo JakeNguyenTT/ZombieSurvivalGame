@@ -28,6 +28,9 @@ public class EnemyBehavior : MonoBehaviour
     public EnemyData Data => m_Data;
     public bool IsBoss => m_IsBoss;
     public bool IsAlive => m_Health > 0;
+    public float HealthFraction => m_MaxHealth > 0 ? Mathf.Clamp01(m_Health / m_MaxHealth) : 0f;
+    public int BossLevel { get; private set; }
+    private float m_MaxHealth;
 
     void Awake()
     {
@@ -39,8 +42,9 @@ public class EnemyBehavior : MonoBehaviour
     {
         transform.position = position;
         m_Speed = data.speed + enhancement.speed;
-        m_Health = data.health + enhancement.health;
+        m_Health = m_MaxHealth = data.health + enhancement.health;
         m_Damage = data.damage + enhancement.damage;
+        BossLevel = 0;
         gameObject.SetActive(true);
         transform.localScale = Vector3.one * data.scale;
         m_Data = data;
@@ -56,10 +60,11 @@ public class EnemyBehavior : MonoBehaviour
     {
         Initialize(position, data, new EnemyEnhancement());
         m_Speed = Mathf.Max(0.5f, data.speed - 1);
-        m_Health = data.health * 10 * bossLevel * healthMultiplier;
+        m_Health = m_MaxHealth = data.health * 10 * bossLevel * healthMultiplier;
         m_Damage = data.damage * (2 + bossLevel);
         transform.localScale = Vector3.one * 5;
         m_IsBoss = true;
+        BossLevel = bossLevel;
     }
 
     void Update()

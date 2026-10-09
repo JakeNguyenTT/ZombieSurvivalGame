@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 // "BOSS INCOMING" banner when a boss spawns, plus a marker on the screen edge pointing
 // at the boss while it is off-screen.
@@ -14,6 +15,9 @@ public class BossIndicator : MonoBehaviour
     private TextMeshProUGUI m_Banner;
     private RectTransform m_Marker;
     private float m_BannerTimer;
+    private RectTransform m_HealthBar;
+    private RectTransform m_HealthFill;
+    private TextMeshProUGUI m_HealthLabel;
 
     public void Init(RectTransform root, TMP_FontAsset font)
     {
@@ -36,7 +40,40 @@ public class BossIndicator : MonoBehaviour
         label.text = "BOSS";
         m_Marker.gameObject.SetActive(false);
 
+        CreateHealthBar(root, font);
         EnemySpawner.Instance.OnBossSpawned += HandleBossSpawned;
+    }
+
+    // Top center, just under the experience bar
+    private void CreateHealthBar(RectTransform root, TMP_FontAsset font)
+    {
+        m_HealthBar = RuntimeUI.CreateRect(root, "BossHealthBar");
+        RuntimeUI.Place(m_HealthBar, new Vector2(0.5f, 1f), new Vector2(0, -130), new Vector2(700, 34));
+        var back = RuntimeUI.CreatePanel(m_HealthBar, "Back", new Color(0f, 0f, 0f, 0.65f));
+        RuntimeUI.Stretch(back.rectTransform);
+        back.raycastTarget = false;
+
+        Image fill = RuntimeUI.CreatePanel(m_HealthBar, "Fill", BossColor);
+        fill.raycastTarget = false;
+        m_HealthFill = fill.rectTransform;
+        m_HealthFill.anchorMin = Vector2.zero;
+        m_HealthFill.anchorMax = Vector2.one;
+        m_HealthFill.offsetMin = new Vector2(4, 4);
+        m_HealthFill.offsetMax = new Vector2(-4, -4);
+
+        m_HealthLabel = RuntimeUI.CreateText(m_HealthBar, "Label", font, 26, TextAlignmentOptions.Center, Color.white);
+        RuntimeUI.Stretch(m_HealthLabel.rectTransform);
+        m_HealthBar.gameObject.SetActive(false);
+    }
+
+    private void UpdateHealthBar(EnemyBehavior boss)
+    {
+        bool show = boss != null && boss.IsAlive;
+        m_HealthBar.gameObject.SetActive(show);
+        if (!show) return;
+        // Shrink from the right by moving the fill's right anchor
+        m_HealthFill.anchorMax = new Vector2(boss.HealthFraction, 1f);
+        m_HealthLabel.text = $"BOSS Lv {boss.BossLevel}";
     }
 
     void OnDestroy()
@@ -56,6 +93,7 @@ public class BossIndicator : MonoBehaviour
     {
         if (m_Banner == null) return;
         UpdateBanner();
+        UpdateHealthBar(EnemySpawner.Instance.ActiveBoss);
         UpdateMarker();
     }
 
