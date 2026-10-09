@@ -16,6 +16,7 @@ public class PlayerManager : MonoBehaviour
     public Transform GunMuzzle => m_GunMuzzle;
     public float PickupRadius => m_PickupRadius;
     public bool IsFullHealth => m_Health >= m_MaxHealth;
+    public float HealthFraction => m_MaxHealth > 0 ? m_Health / m_MaxHealth : 0f;
     private ThirdPersonController m_Controller;
     private float m_Health;
     private float m_MaxHealth;

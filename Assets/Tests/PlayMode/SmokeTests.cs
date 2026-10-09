@@ -7,43 +7,23 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using static PlayModeHelpers;
 using Object = UnityEngine.Object;
 
 // Plays through menu -> game -> boss -> game over -> menu. Any error or exception logged
-// along the way fails the test. Game types live in Assembly-CSharp, which test assemblies
-// can't reference, so they are driven by name through reflection.
+// along the way fails the test.
 public class SmokeTests
 {
-    private const BindingFlags AnyInstance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-    private static readonly string[] IntKeys = { "coins", "best_kills", "meta_MaxHealth", "meta_Damage", "meta_MoveSpeed", "meta_PickupRange" };
-    private static readonly string[] FloatKeys = { "best_time", "music_volume", "sfx_volume" };
-    private static readonly string[] StringKeys = { "character" };
-
-    private readonly Dictionary<string, object> m_SavedPrefs = new Dictionary<string, object>();
+    private readonly PrefsSnapshot m_Prefs = new PrefsSnapshot();
 
     [SetUp]
-    public void SnapshotPrefs()
-    {
-        m_SavedPrefs.Clear();
-        foreach (var key in IntKeys) if (PlayerPrefs.HasKey(key)) m_SavedPrefs[key] = PlayerPrefs.GetInt(key);
-        foreach (var key in FloatKeys) if (PlayerPrefs.HasKey(key)) m_SavedPrefs[key] = PlayerPrefs.GetFloat(key);
-        foreach (var key in StringKeys) if (PlayerPrefs.HasKey(key)) m_SavedPrefs[key] = PlayerPrefs.GetString(key);
-    }
+    public void SnapshotPrefs() => m_Prefs.Capture();
 
     [TearDown]
     public void RestorePrefs()
     {
         Time.timeScale = 1f;
-        foreach (var key in IntKeys) PlayerPrefs.DeleteKey(key);
-        foreach (var key in FloatKeys) PlayerPrefs.DeleteKey(key);
-        foreach (var key in StringKeys) PlayerPrefs.DeleteKey(key);
-        foreach (var pair in m_SavedPrefs)
-        {
-            if (pair.Value is int i) PlayerPrefs.SetInt(pair.Key, i);
-            else if (pair.Value is float f) PlayerPrefs.SetFloat(pair.Key, f);
-            else PlayerPrefs.SetString(pair.Key, (string)pair.Value);
-        }
-        PlayerPrefs.Save();
+        m_Prefs.Restore();
     }
 
     [UnityTest, Timeout(180000)]
@@ -151,11 +131,38 @@ public class SmokeTests
         yield return WaitRealtime(0.5f);
     }
 
-    private static bool IsGameOver(Component game)
+    // Regression: gems used to be checked against 0.1 units before moving, so a player walking at
+    // 30 fps (0.17 units per frame) dragged gems along forever without collecting them
+    [UnityTest, Timeout(60000)]
+    public IEnumerator WalkingPlayer_CollectsGems_At30Fps()
     {
-        FieldInfo field = game.GetType().GetField("m_IsGameOver", AnyInstance);
-        return field != null && (bool)field.GetValue(game);
+        yield return LoadScene("GameScene");
+        Component player = FindByTypeName("PlayerManager");
+        Component experience = FindByTypeName("ExperienceManager");
+        player.GetType().GetField("m_InvisibleTimer", AnyInstance).SetValue(player, 9999f);
+        Invoke(FindByTypeName("EnemySpawner"), "StopSpawning");
+
+        Time.captureDeltaTime = 1f / 30f;
+        try
+        {
+            Vector3 walk = Vector3.right * 5f / 30f; // 5 units/s
+            Invoke(FindByTypeName("ExpSpawner"), "SpawnExp", player.transform.position + Vector3.right * 1.5f);
+            float before = ExperienceOf(experience);
+            for (int frame = 0; frame < 60; frame++)
+            {
+                player.transform.position += walk;
+                yield return null;
+            }
+            Assert.That(ExperienceOf(experience), Is.GreaterThan(before), "Gem was not collected while walking");
+        }
+        finally
+        {
+            Time.captureDeltaTime = 0f;
+        }
     }
+
+    private static float ExperienceOf(Component experience) =>
+        (float)GetField(experience, "m_CurrentExp") + 1000f * (int)GetProperty(experience, "CurrentLevel");
 
     private static string UpgradeTypeName(object upgrade) =>
         upgrade.GetType().GetField("type").GetValue(upgrade).ToString();
@@ -167,19 +174,6 @@ public class SmokeTests
         var options = (Array)Invoke(upgradeManager, "GetUpgradeOptions", 1);
         Assert.That(options.Length, Is.GreaterThan(0), "No upgrade options offered");
         Invoke(uiManager, "SelectUpgrade", options.GetValue(0));
-    }
-
-    private static IEnumerator LoadScene(string name)
-    {
-        AsyncOperation load = SceneManager.LoadSceneAsync(name);
-        while (!load.isDone) yield return null;
-        yield return null;
-    }
-
-    private static IEnumerator WaitRealtime(float seconds)
-    {
-        float end = Time.realtimeSinceStartup + seconds;
-        while (Time.realtimeSinceStartup < end) yield return null;
     }
 
     // Only when run from the editor's Test Runner window: in batch mode WaitForEndOfFrame never
@@ -195,27 +189,5 @@ public class SmokeTests
         Directory.CreateDirectory(folder);
         File.WriteAllBytes(Path.Combine(folder, name + ".png"), texture.EncodeToPNG());
         Object.Destroy(texture);
-    }
-
-    private static Component FindByTypeName(string typeName)
-    {
-        foreach (var behaviour in Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include))
-            if (behaviour.GetType().Name == typeName)
-                return behaviour;
-        return null;
-    }
-
-    private static object Invoke(Component target, string method, params object[] args)
-    {
-        MethodInfo info = target.GetType().GetMethod(method, AnyInstance);
-        Assert.IsNotNull(info, $"{target.GetType().Name}.{method} not found");
-        return info.Invoke(target, args);
-    }
-
-    private static object GetProperty(Component target, string property)
-    {
-        PropertyInfo info = target.GetType().GetProperty(property, AnyInstance);
-        Assert.IsNotNull(info, $"{target.GetType().Name}.{property} not found");
-        return info.GetValue(target);
     }
 }
