@@ -165,6 +165,7 @@ public class EnemyBehavior : MonoBehaviour
         if (toPlayer.magnitude <= m_Data.explodeRadius)
             PlayerManager.Instance.TakeDamage(m_Damage);
         if (CameraController.Instance != null) CameraController.Instance.Shake(0.4f, 0.3f);
+        if (ScreenEffects.Instance != null) ScreenEffects.Instance.PlayExplosion();
         PlayOptionalSound(m_Data.specialSound);
         Die();
     }

@@ -60,7 +60,11 @@ public class UIManager : MonoBehaviour
             m_UpgradePanel.CreateRerollButton(buttonTemplate);
     }
 
-    public void UpdateHealth(float health, float maxHealth) => m_HealthBar.SetValue(health, maxHealth);
+    public void UpdateHealth(float health, float maxHealth)
+    {
+        m_HealthBar.SetValue(health, maxHealth);
+        if (ScreenEffects.Instance != null) ScreenEffects.Instance.SetHealth(health, maxHealth);
+    }
     public void UpdateExperience(float value, float maxValue) => m_ExpBar.SetValue(value, maxValue, true);
     public void UpdateLevel(int value) => m_LevelText.text = $"{value}";
     public void UpdateTime(float time) => m_TimeText.text = $"Time: {FormatTime(time)}";

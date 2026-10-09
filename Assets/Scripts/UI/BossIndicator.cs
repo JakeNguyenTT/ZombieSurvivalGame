@@ -87,6 +87,7 @@ public class BossIndicator : MonoBehaviour
         m_BannerTimer = BannerDuration;
         m_Banner.gameObject.SetActive(true);
         if (CameraController.Instance != null) CameraController.Instance.Shake(0.3f, 0.5f);
+        if (ScreenEffects.Instance != null) ScreenEffects.Instance.PlayBossArrival();
     }
 
     void Update()

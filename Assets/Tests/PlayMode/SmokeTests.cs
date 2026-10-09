@@ -70,6 +70,7 @@ public class SmokeTests
         Assert.IsNotNull(game, "GameManager missing");
 
         Assert.IsNotNull(FindByTypeName("EnemyNavigation"), "Enemy navigation was not created");
+        Assert.IsNotNull(FindByTypeName("ScreenEffects"), "Screen effects were not created");
 
         GameObject props = GameObject.Find("ArenaProps");
         Assert.IsNotNull(props, "Arena props were not spawned");

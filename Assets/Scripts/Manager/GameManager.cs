@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour
     {
         ArenaProps.Spawn(GetPlayerPosition());
         gameObject.AddComponent<EnemyNavigation>();
+        gameObject.AddComponent<ScreenEffects>();
         m_EnemySpawner.Initialize();
         m_UIManager.Initialize();
         // m_AudioManager.PlayMusic("BackgroundMusic");

@@ -58,6 +58,7 @@ public class PlayerManager : MonoBehaviour
         if (m_Health <= 0 || m_InvisibleTimer > 0) return;
         m_Health -= amount;
         if (CameraController.Instance != null) CameraController.Instance.Shake(0.15f, 0.15f);
+        if (ScreenEffects.Instance != null) ScreenEffects.Instance.PlayHit();
         UIManager.Instance.UpdateHealth(m_Health, m_MaxHealth);
         if (m_Health <= 0)
         {
