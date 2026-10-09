@@ -23,6 +23,7 @@ public class EnemySpawner : MonoBehaviour
     private float m_SpawnTimer;
     private int m_BossLevel; // number of bosses spawned so far
 
+    public IReadOnlyList<EnemyBehavior> ActiveEnemies => m_ActiveEnemies;
     public EnemyBehavior ActiveBoss { get; private set; }
     public int BossesKilled { get; private set; }
     public event Action<EnemyBehavior> OnBossSpawned;

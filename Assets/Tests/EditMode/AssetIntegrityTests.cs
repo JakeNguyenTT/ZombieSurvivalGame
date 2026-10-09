@@ -13,6 +13,8 @@ public class AssetIntegrityTests
     private const string GameScenePath = "Assets/Scenes/GameScene.unity";
     private const string MenuScenePath = "Assets/Scenes/MenuScene.unity";
     private const int AddWeaponType = 1; // UpgradeType.AddWeapon
+    private const int EvolveType = 10;   // UpgradeType.Evolve
+    private const int LastProjectileFiringType = 2; // FiringType.Automatic
 
     [Test]
     public void UpgradeManager_OffersValidUpgrades()
@@ -26,8 +28,17 @@ public class AssetIntegrityTests
                 var data = new SerializedObject(upgrade);
                 Assert.That(data.FindProperty("description").stringValue, Is.Not.Empty, upgrade.name);
                 Assert.That(data.FindProperty("weight").floatValue, Is.GreaterThan(0f), upgrade.name);
-                if (data.FindProperty("type").intValue == AddWeaponType)
+                int type = data.FindProperty("type").intValue;
+                if (type == AddWeaponType)
                     AssertWeaponValid(data.FindProperty("weaponData").objectReferenceValue, upgrade.name);
+                if (type == EvolveType)
+                {
+                    Object evolved = data.FindProperty("weaponData").objectReferenceValue;
+                    AssertWeaponValid(evolved, upgrade.name);
+                    Object baseWeapon = new SerializedObject(evolved).FindProperty("evolvesFrom").objectReferenceValue;
+                    Assert.IsNotNull(baseWeapon, $"{evolved.name} does not say what it evolves from");
+                    Assert.IsTrue(OffersWeapon(upgrades, baseWeapon), $"{baseWeapon.name} has no weapon card, so {evolved.name} can never be reached");
+                }
             }
         });
     }
@@ -84,8 +95,26 @@ public class AssetIntegrityTests
     {
         Assert.IsNotNull(weapon, $"{owner} has no weapon");
         var data = new SerializedObject(weapon);
-        Assert.IsNotNull(data.FindProperty("projectilePrefab").objectReferenceValue, $"{weapon.name} has no projectile");
+        int firingType = data.FindProperty("firingType").intValue;
+        // Single, Spread and Automatic shoot projectile prefabs; Orbit, Homing and Aura build their own visuals
+        if (firingType <= LastProjectileFiringType)
+            Assert.IsNotNull(data.FindProperty("projectilePrefab").objectReferenceValue, $"{weapon.name} has no projectile");
         Assert.That(data.FindProperty("fireRate").floatValue, Is.GreaterThan(0f), weapon.name);
+        Assert.That(data.FindProperty("damage").floatValue, Is.GreaterThan(0f), weapon.name);
+        Assert.That(data.FindProperty("count").intValue, Is.GreaterThan(0), weapon.name);
+    }
+
+    // True when some AddWeapon card in the pool hands out `weapon`
+    private static bool OffersWeapon(List<Object> upgrades, Object weapon)
+    {
+        foreach (var upgrade in upgrades)
+        {
+            var data = new SerializedObject(upgrade);
+            if (data.FindProperty("type").intValue == AddWeaponType &&
+                data.FindProperty("weaponData").objectReferenceValue == weapon)
+                return true;
+        }
+        return false;
     }
 
     private static void WithScene(string path, System.Action<Scene> check)

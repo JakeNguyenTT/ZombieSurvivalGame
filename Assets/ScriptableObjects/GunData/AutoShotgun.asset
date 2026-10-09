@@ -10,17 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f41a4cece847b5f4491d20993efc2c56, type: 3}
-  m_Name: Shotgun
+  m_Name: AutoShotgun
   m_EditorClassIdentifier: 
-  weaponName: Shotgun
+  weaponName: Auto Shotgun
   gunPrefab: {fileID: 0}
   firingType: 1
   projectilePrefab: {fileID: -7508747050436777962, guid: e67a37406bfbeb8479b8d481eefeac47, type: 3}
-  fireRate: 1.5
+  fireRate: 0.6
   damage: 20
   range: 15
   maxAmmo: 10
   projectileSpeed: 12
   penetration: 0
   shootSound: {fileID: 8300000, guid: 5dbc74a65da58144aa0a20190bcd4909, type: 3}
-  count: 3
+  count: 5
+  radius: 2.5
+  rotationSpeed: 180
+  hitInterval: 0.5
+  pierceAll: 0
+  healPerTick: 0
+  color: {r: 1, g: 0.8, b: 0.4, a: 1}
+  hitEffect: {fileID: 0}
+  evolvesFrom: {fileID: 11400000, guid: 277fe1056e98464facc4128885995ab0, type: 2}
+  requiredPassive: 6

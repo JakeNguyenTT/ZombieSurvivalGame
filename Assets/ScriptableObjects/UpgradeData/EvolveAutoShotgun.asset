@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52a5e4a853eb6a04eb1e45ddcb868f07, type: 3}
-  m_Name: Shotgun
+  m_Name: EvolveAutoShotgun
   m_EditorClassIdentifier: 
-  type: 1
+  type: 10
   value: 0
-  description: '3-way spread'
-  weaponData: {fileID: 11400000, guid: 277fe1056e98464facc4128885995ab0, type: 2}
-  weight: 0.5
+  description: 'Shotgun + Fire Rate: 5 pellets, much faster'
+  weaponData: {fileID: 11400000, guid: b0aaa48315d74867b23b0ac2bd0c1a1e, type: 2}
+  weight: 3

@@ -12,8 +12,10 @@ public class UpgradeItem : MonoBehaviour
 
     public void Setup(UpgradeData upgrade)
     {
-        m_NameText.text = upgrade.name;
-        m_DescriptionText.text = upgrade.description;
+        // Weapon cards read differently depending on what is owned (new / level-up / evolve)
+        var (title, description) = UpgradeManager.Instance.Describe(upgrade);
+        m_NameText.text = title;
+        m_DescriptionText.text = description;
         m_UpgradeButton.onClick.RemoveAllListeners();
         m_UpgradeButton.onClick.AddListener(() => OnButtonUpgrade(upgrade));
     }

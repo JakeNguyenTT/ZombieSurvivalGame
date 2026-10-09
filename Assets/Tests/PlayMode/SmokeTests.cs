@@ -69,6 +69,10 @@ public class SmokeTests
         Component game = FindByTypeName("GameManager");
         Assert.IsNotNull(game, "GameManager missing");
 
+        // The test player never moves, so keep them alive: a long post-hit invulnerability window
+        Component player = FindByTypeName("PlayerManager");
+        player.GetType().GetField("m_InvisibleTimer", AnyInstance).SetValue(player, 9999f);
+
         // The player stands still, so grant experience directly to exercise level-ups
         Component experience = FindByTypeName("ExperienceManager");
         Invoke(experience, "AddExperience", 150f);
@@ -103,6 +107,25 @@ public class SmokeTests
         Assert.That(upgradesPicked, Is.GreaterThanOrEqualTo(1), "No upgrade was picked");
         yield return Screenshot("04_gameplay");
 
+        // Every weapon card to max level, then every evolution, then let them fight a while
+        Assert.IsFalse(IsGameOver(game), "Player died despite invulnerability");
+        {
+            Component upgradeManager = FindByTypeName("UpgradeManager");
+            var upgrades = (IList)upgradeManager.GetType().GetField("m_AvailableUpgrades", AnyInstance).GetValue(upgradeManager);
+            foreach (object upgrade in upgrades)
+                if (UpgradeTypeName(upgrade) == "AddWeapon")
+                    for (int i = 0; i < 5; i++) Invoke(upgradeManager, "ApplyUpgrade", upgrade);
+            foreach (object upgrade in upgrades)
+                if (UpgradeTypeName(upgrade) == "Evolve")
+                    Invoke(upgradeManager, "ApplyUpgrade", upgrade);
+
+            var weapons = (ICollection)GetProperty(FindByTypeName("WeaponSystem"), "Weapons");
+            Assert.That(weapons.Count, Is.GreaterThanOrEqualTo(5), "Weapon cards did not add weapons");
+            Time.timeScale = 3f;
+            yield return WaitRealtime(2f);
+            yield return Screenshot("04b_weapons");
+        }
+
         Invoke(game, "SkipToBoss");
         Time.timeScale = 1f;
         yield return WaitRealtime(1f);
@@ -113,6 +136,7 @@ public class SmokeTests
         yield return null;
         yield return null;
         yield return Screenshot("06_gameover");
+        Assert.IsTrue(IsGameOver(game), "GameOver did not end the run");
         Assert.AreEqual(0f, Time.timeScale, "Game over should pause the game");
 
         Time.timeScale = 1f;
@@ -125,6 +149,9 @@ public class SmokeTests
         FieldInfo field = game.GetType().GetField("m_IsGameOver", AnyInstance);
         return field != null && (bool)field.GetValue(game);
     }
+
+    private static string UpgradeTypeName(object upgrade) =>
+        upgrade.GetType().GetField("type").GetValue(upgrade).ToString();
 
     private static void PickFirstUpgrade()
     {

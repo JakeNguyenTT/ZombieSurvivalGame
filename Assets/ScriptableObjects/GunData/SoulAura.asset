@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f41a4cece847b5f4491d20993efc2c56, type: 3}
+  m_Name: SoulAura
+  m_EditorClassIdentifier: 
+  weaponName: Soul Aura
+  gunPrefab: {fileID: 0}
+  firingType: 5
+  projectilePrefab: {fileID: 0}
+  fireRate: 1
+  damage: 8
+  range: 0
+  maxAmmo: 10
+  projectileSpeed: 0
+  penetration: 0
+  shootSound: {fileID: 0}
+  count: 1
+  radius: 3
+  rotationSpeed: 180
+  hitInterval: 0.5
+  pierceAll: 0
+  healPerTick: 1
+  color: {r: 0.3, g: 1, b: 0.6, a: 1}
+  hitEffect: {fileID: 0}
+  evolvesFrom: {fileID: 11400000, guid: 29c2ae6e7fc84b818a2b102269e662ca, type: 2}
+  requiredPassive: 3

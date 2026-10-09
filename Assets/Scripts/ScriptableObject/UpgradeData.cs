@@ -22,4 +22,5 @@ public enum UpgradeType
     ProjectileSpeed,
     MaxAmmo,
     Magnet,
+    Evolve, // weaponData = the evolved weapon
 }
