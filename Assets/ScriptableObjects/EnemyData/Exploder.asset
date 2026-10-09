@@ -19,6 +19,7 @@ MonoBehaviour:
   damage: 30
   hurtSound: {fileID: 8300000, guid: 4ab62cbf20de44a4582c40ed442be13a, type: 3}
   deathSound: {fileID: 8300000, guid: 5b29b0de6b62747e68ebf332c8811f35, type: 3}
+  specialSound: {fileID: 8300000, guid: 380a61624a607f042ab5e96218f37633, type: 3}
   tint: {r: 1, g: 0.8, b: 0.3, a: 1}
   scale: 1
   spawnWeight: 3

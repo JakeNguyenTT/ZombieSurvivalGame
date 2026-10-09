@@ -144,6 +144,8 @@ public class EnemySpawner : MonoBehaviour
         boss.InitializeBoss(RandomSpawnPosition(), bossType, level, Difficulty.HealthMultiplier(GameManager.Instance.GameTime));
         Track(boss);
         ActiveBoss = boss;
+        if (bossType.specialSound != null)
+            AudioManager.Instance.PlaySFX(bossType.specialSound, boss.transform.position, 1f, 0.8f); // pitched down: bigger
         OnBossSpawned?.Invoke(boss);
     }
 

@@ -19,6 +19,10 @@ public class EnemyData : ScriptableObject
     public float damage = 5f;
     public AudioClip hurtSound;
     public AudioClip deathSound;
+    [Tooltip("Spitter: each shot")]
+    public AudioClip attackSound;
+    [Tooltip("Exploder: the explosion. Boss base type: played when a boss spawns")]
+    public AudioClip specialSound;
 
     [Header("Look")]
     public Color tint = Color.white;

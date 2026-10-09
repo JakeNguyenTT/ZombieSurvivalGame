@@ -117,6 +117,7 @@ public class EnemyBehavior : MonoBehaviour
         {
             Vector3 muzzle = transform.position + Vector3.up * 1.2f + direction * 0.5f;
             EnemyProjectile.Fire(muzzle, direction, m_Data.projectileSpeed, m_Damage, m_Data.tint);
+            PlayOptionalSound(m_Data.attackSound);
             m_AttackTimer = m_Data.attackCooldown;
         }
     }
@@ -145,6 +146,7 @@ public class EnemyBehavior : MonoBehaviour
         if (toPlayer.magnitude <= m_Data.explodeRadius)
             PlayerManager.Instance.TakeDamage(m_Damage);
         if (CameraController.Instance != null) CameraController.Instance.Shake(0.4f, 0.3f);
+        PlayOptionalSound(m_Data.specialSound);
         Die();
     }
 
@@ -196,6 +198,12 @@ public class EnemyBehavior : MonoBehaviour
         EffectPool.Play(m_DeathEffect, transform.position);
         gameObject.SetActive(false);
         EnemySpawner.Instance.ReturnEnemy(this);
+    }
+
+    // AudioManager logs an error for missing clips; these sounds are optional per enemy type
+    private void PlayOptionalSound(AudioClip clip)
+    {
+        if (clip != null) AudioManager.Instance.PlaySFX(clip, transform.position);
     }
 
     private void SetColor(Color color)
