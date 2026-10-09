@@ -132,6 +132,29 @@ public class MetaUpgradesTests
     }
 }
 
+public class AdaptiveScaleTests
+{
+    [Test]
+    public void SlowFrames_LowerScale_DownToMinimum()
+    {
+        Assert.AreEqual(0.7f, AdaptiveScale.Next(0.8f, 1f / 30f, 0.8f), 1e-4f);
+        Assert.AreEqual(0.6f, AdaptiveScale.Next(0.6f, 1f / 30f, 0.8f), 1e-4f);
+    }
+
+    [Test]
+    public void FastFrames_RaiseScale_UpToAssetValue()
+    {
+        Assert.AreEqual(0.8f, AdaptiveScale.Next(0.7f, 1f / 60f, 0.8f), 1e-4f);
+        Assert.AreEqual(0.8f, AdaptiveScale.Next(0.8f, 1f / 60f, 0.8f), 1e-4f);
+    }
+
+    [Test]
+    public void InBetween_KeepsScale()
+    {
+        Assert.AreEqual(0.7f, AdaptiveScale.Next(0.7f, 1f / 54f, 0.8f), 1e-4f);
+    }
+}
+
 public class TextUtilTests
 {
     [TestCase("ProjectileSpeed", "Projectile Speed")]
