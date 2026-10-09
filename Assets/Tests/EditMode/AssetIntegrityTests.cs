@@ -78,6 +78,21 @@ public class AssetIntegrityTests
         }
     }
 
+    [Test]
+    public void ArenaProps_ReferenceExistingPrefabs()
+    {
+        ScriptableObject set = Resources.Load<ScriptableObject>("ArenaProps");
+        Assert.IsNotNull(set, "Resources/ArenaProps missing");
+        var data = new SerializedObject(set);
+        foreach (string field in new[] { "solidProps", "decorProps" })
+        {
+            SerializedProperty list = data.FindProperty(field);
+            Assert.That(list.arraySize, Is.GreaterThan(0), field);
+            for (int i = 0; i < list.arraySize; i++)
+                Assert.IsNotNull(list.GetArrayElementAtIndex(i).objectReferenceValue, $"{field}[{i}] is missing");
+        }
+    }
+
     [TestCase(GameScenePath)]
     [TestCase(MenuScenePath)]
     public void Scene_HasNoMissingScripts(string path)

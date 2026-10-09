@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d42983bf43647bfb2c2cbf557f45b88, type: 3}
+  m_Name: ArenaProps
+  m_EditorClassIdentifier: 
+  solidProps:
+  - {fileID: 7405846476849542632, guid: c6308cb7062fac34e8e50600086b12a1, type: 3}
+  - {fileID: 5202732821079448320, guid: cebfacc247a640945a2c30b442202fca, type: 3}
+  - {fileID: 4680757731160225450, guid: 0fde05fa0f3321942a21896ff4f0856f, type: 3}
+  - {fileID: 8783306491908617939, guid: f02116c209ecd9e488fc4d2cd8996133, type: 3}
+  - {fileID: 1576488453971893466, guid: a778b631c6253a04899cb31bad047c81, type: 3}
+  - {fileID: 2222111361404534124, guid: 88f2fd29f58b9734683512546acec310, type: 3}
+  - {fileID: 4661435515762455780, guid: e289bf5debb17f6459818c207d781953, type: 3}
+  - {fileID: 6941765000743290380, guid: c60edd51c065ceb46b345849a03bc106, type: 3}
+  - {fileID: 2807449429036958551, guid: f0c16f0ea935ea64297ca1d4d55d9746, type: 3}
+  - {fileID: 9069115365609291303, guid: 60f79905accf3b24fa0114b941f1aac0, type: 3}
+  decorProps:
+  - {fileID: 4263922822445002727, guid: 3cdafb3c2f54d434894928d72d282874, type: 3}
+  - {fileID: 6239969156481229051, guid: b71b0f8d2f881c743a85228f3030d1cb, type: 3}
+  - {fileID: 38335279662140195, guid: 34d3f526198dae440bb2ce6005d86055, type: 3}
+  solidCount: 80
+  decorCount: 100
+  areaRadius: 100
+  clearRadius: 6
+  minSpacing: 4
+  edgeMargin: 2

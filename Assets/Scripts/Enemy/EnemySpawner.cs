@@ -122,8 +122,15 @@ public class EnemySpawner : MonoBehaviour
 
     private Vector3 RandomSpawnPosition()
     {
-        Vector2 circle = Random.insideUnitCircle.normalized * m_SpawnRange;
-        return new Vector3(circle.x, 0, circle.y) + GameManager.Instance.GetPlayerPosition();
+        // A few tries to avoid dropping an enemy inside a rock or tree
+        Vector3 position = Vector3.zero;
+        for (int attempt = 0; attempt < 5; attempt++)
+        {
+            Vector2 circle = Random.insideUnitCircle.normalized * m_SpawnRange;
+            position = new Vector3(circle.x, 0, circle.y) + GameManager.Instance.GetPlayerPosition();
+            if (ArenaProps.IsClear(position, 2f)) break;
+        }
+        return position;
     }
 
     public void SpawnEnemy()

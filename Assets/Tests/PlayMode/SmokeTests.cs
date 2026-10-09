@@ -69,6 +69,10 @@ public class SmokeTests
         Component game = FindByTypeName("GameManager");
         Assert.IsNotNull(game, "GameManager missing");
 
+        GameObject props = GameObject.Find("ArenaProps");
+        Assert.IsNotNull(props, "Arena props were not spawned");
+        Assert.That(props.transform.childCount, Is.GreaterThan(20), "Too few arena props placed");
+
         // The test player never moves, so keep them alive: a long post-hit invulnerability window
         Component player = FindByTypeName("PlayerManager");
         player.GetType().GetField("m_InvisibleTimer", AnyInstance).SetValue(player, 9999f);
